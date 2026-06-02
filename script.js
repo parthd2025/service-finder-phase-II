@@ -1,23 +1,58 @@
 // Variable to store all providers
 let allProviders = [];
 
+// Google Apps Script URL
+const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZJmQJRr3swLELNHmJd3xkw5DwJKR_whAnux-Chk_nypn_O1MQCxZvHbpfr2EEEKoH/exec';
+
 // Run when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadProviders();
-    populateServiceFilter();  // Populate dropdown with service types
-    populateAreaFilter();     // Populate dropdown with areas
 });
 
-// Load provider data from data.json file
+// Load provider data from Google Apps Script URL
 function loadProviders() {
-    // Use fetch to get data from JSON file
-    fetch('data.json')
-        .then(response => response.json())  // Convert response to JSON
-        .then(data => {
-            allProviders = data.services;    // Store all providers
-            displayProviders(allProviders);  // Display them on page
+    // Show loading message
+    const loadingMessage = document.getElementById('loadingMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const servicesList = document.getElementById('servicesList');
+    
+    loadingMessage.style.display = 'block';
+    errorMessage.style.display = 'none';
+    servicesList.innerHTML = '';
+    
+    // Use fetch to get data from Google Apps Script
+    fetch(GOOGLE_APPS_SCRIPT_URL)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();  // Convert response to JSON
         })
-        .catch(error => console.error('Error loading providers:', error));
+        .then(data => {
+            // Handle the data from Google Apps Script
+            allProviders = data.services || data;  // Support both formats
+            
+            // Hide loading message
+            loadingMessage.style.display = 'none';
+            
+            // Display providers
+            displayProviders(allProviders);
+            
+            // Populate filters after data loads
+            populateServiceFilter();
+            populateAreaFilter();
+            
+            // Add event listeners
+            addEventListeners();
+        })
+        .catch(error => {
+            console.error('Error loading providers:', error);
+            
+            // Hide loading, show error
+            loadingMessage.style.display = 'none';
+            errorMessage.style.display = 'block';
+            servicesList.innerHTML = '';
+        });
 }
 
 // Populate the service type dropdown filter with unique services
@@ -27,6 +62,11 @@ function populateServiceFilter() {
     
     // Get the dropdown element
     const filterDropdown = document.getElementById('serviceFilter');
+    
+    // Clear existing options (keep the default "All Services" option)
+    while (filterDropdown.options.length > 1) {
+        filterDropdown.remove(1);
+    }
     
     // Add each unique service as an option
     uniqueServices.forEach(service => {
@@ -44,6 +84,11 @@ function populateAreaFilter() {
     
     // Get the dropdown element
     const filterDropdown = document.getElementById('areaFilter');
+    
+    // Clear existing options (keep the default "All Areas" option)
+    while (filterDropdown.options.length > 1) {
+        filterDropdown.remove(1);
+    }
     
     // Add each unique area as an option
     uniqueAreas.forEach(area => {
@@ -156,17 +201,20 @@ function applySearchAndFilter() {
     displayProviders(filteredProviders);
 }
 
-// Add event listener to search box for real-time filtering
-document.getElementById('searchBox').addEventListener('input', function() {
-    applySearchAndFilter();
-});
+// Function to add event listeners to search and filter elements
+function addEventListeners() {
+    // Add event listener to search box for real-time filtering
+    document.getElementById('searchBox').addEventListener('input', function() {
+        applySearchAndFilter();
+    });
 
-// Add event listener to service filter dropdown
-document.getElementById('serviceFilter').addEventListener('change', function() {
-    applySearchAndFilter();
-});
+    // Add event listener to service filter dropdown
+    document.getElementById('serviceFilter').addEventListener('change', function() {
+        applySearchAndFilter();
+    });
 
-// Add event listener to area filter dropdown
-document.getElementById('areaFilter').addEventListener('change', function() {
-    applySearchAndFilter();
-});
+    // Add event listener to area filter dropdown
+    document.getElementById('areaFilter').addEventListener('change', function() {
+        applySearchAndFilter();
+    });
+}

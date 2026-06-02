@@ -396,3 +396,35 @@ body {
         font-size: 0.95em;
     }
 }
+
+/* Loading and Error Messages */
+.loading-message {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 1.2em;
+    color: #667eea;
+    font-weight: 500;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.error-message {
+    background-color: #fee;
+    border: 2px solid #fcc;
+    color: #c33;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+/* Pulse animation for loading message */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
