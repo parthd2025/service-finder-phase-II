@@ -1,0 +1,144 @@
+{
+  "services": [
+    {
+      "id": 1,
+      "name": "Sharma Electricals",
+      "service": "Electrician",
+      "area": "Whitefield",
+      "phone": "+91-9876543201"
+    },
+    {
+      "id": 2,
+      "name": "Quick Fix Plumbing",
+      "service": "Plumber",
+      "area": "Whitefield",
+      "phone": "+91-9876543202"
+    },
+    {
+      "id": 3,
+      "name": "Fresh Milk Dairy",
+      "service": "Milk Service",
+      "area": "Whitefield",
+      "phone": "+91-9876543203"
+    },
+    {
+      "id": 4,
+      "name": "Rajesh Auto Service",
+      "service": "Auto Driver",
+      "area": "Whitefield",
+      "phone": "+91-9876543204"
+    },
+    {
+      "id": 5,
+      "name": "Skilled Carpenter Studio",
+      "service": "Carpenter",
+      "area": "Whitefield",
+      "phone": "+91-9876543205"
+    },
+    {
+      "id": 6,
+      "name": "Kumar Electric Works",
+      "service": "Electrician",
+      "area": "KR Puram",
+      "phone": "+91-9876543206"
+    },
+    {
+      "id": 7,
+      "name": "Reliable Plumbing Hub",
+      "service": "Plumber",
+      "area": "KR Puram",
+      "phone": "+91-9876543207"
+    },
+    {
+      "id": 8,
+      "name": "Pure Milk Co.",
+      "service": "Milk Service",
+      "area": "KR Puram",
+      "phone": "+91-9876543208"
+    },
+    {
+      "id": 9,
+      "name": "Professional Cabbie",
+      "service": "Auto Driver",
+      "area": "KR Puram",
+      "phone": "+91-9876543209"
+    },
+    {
+      "id": 10,
+      "name": "Wooden Works",
+      "service": "Carpenter",
+      "area": "KR Puram",
+      "phone": "+91-9876543210"
+    },
+    {
+      "id": 11,
+      "name": "Elite Electric Solutions",
+      "service": "Electrician",
+      "area": "Marathahalli",
+      "phone": "+91-9876543211"
+    },
+    {
+      "id": 12,
+      "name": "Best Plumbers",
+      "service": "Plumber",
+      "area": "Marathahalli",
+      "phone": "+91-9876543212"
+    },
+    {
+      "id": 13,
+      "name": "Golden Milk Delivery",
+      "service": "Milk Service",
+      "area": "Marathahalli",
+      "phone": "+91-9876543213"
+    },
+    {
+      "id": 14,
+      "name": "City Taxi Express",
+      "service": "Auto Driver",
+      "area": "Marathahalli",
+      "phone": "+91-9876543214"
+    },
+    {
+      "id": 15,
+      "name": "Master Carpentry",
+      "service": "Carpenter",
+      "area": "Marathahalli",
+      "phone": "+91-9876543215"
+    },
+    {
+      "id": 16,
+      "name": "Indiranagar Electric Hub",
+      "service": "Electrician",
+      "area": "Indiranagar",
+      "phone": "+91-9876543216"
+    },
+    {
+      "id": 17,
+      "name": "Prime Plumbing Services",
+      "service": "Plumber",
+      "area": "Indiranagar",
+      "phone": "+91-9876543217"
+    },
+    {
+      "id": 18,
+      "name": "Organic Milk Supply",
+      "service": "Milk Service",
+      "area": "HSR Layout",
+      "phone": "+91-9876543218"
+    },
+    {
+      "id": 19,
+      "name": "HSR Auto Rental",
+      "service": "Auto Driver",
+      "area": "HSR Layout",
+      "phone": "+91-9876543219"
+    },
+    {
+      "id": 20,
+      "name": "Premium Furniture & Repairs",
+      "service": "Carpenter",
+      "area": "HSR Layout",
+      "phone": "+91-9876543220"
+    }
+  ]
+}

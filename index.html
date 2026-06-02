@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <h1>Service Finder</h1>
+            <p>Find the best service providers in your area</p>
+        </header>
+
+        <!-- Search Box Section -->
+        <div class="search-section">
+            <input 
+                type="text" 
+                id="searchBox" 
+                class="search-box" 
+                placeholder="Search by provider name, service type, or area..."
+            >
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="serviceFilter">Filter by Service Type:</label>
+                <select id="serviceFilter" class="filter-dropdown">
+                    <option value="">All Services</option>
+                    <!-- Service options will be added here by JavaScript -->
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="areaFilter">Filter by Area:</label>
+                <select id="areaFilter" class="filter-dropdown">
+                    <option value="">All Areas</option>
+                    <!-- Area options will be added here by JavaScript -->
+                </select>
+            </div>
+        </div>
+
+        <!-- Service Providers Display Section -->
+        <div id="servicesList" class="services-container">
+            <!-- Provider cards are dynamically created here by JavaScript -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

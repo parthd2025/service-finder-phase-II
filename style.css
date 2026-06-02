@@ -1,0 +1,398 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 20px 10px;
+}
+
+/* Container styling */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 20px 60px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* Header styling */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 50px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.header h1 {
+    font-size: 2.8em;
+    margin-bottom: 12px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.header p {
+    font-size: 1.15em;
+    opacity: 0.95;
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+}
+
+/* Search section styling - Sticky on mobile */
+.search-section {
+    padding: 25px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e8ecf1;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.search-box {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1em;
+    border: 2px solid #e0e6ed;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background-color: white;
+    color: #333;
+}
+
+.search-box::placeholder {
+    color: #999;
+}
+
+.search-box:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    background-color: #fafbff;
+}
+
+/* Filter section styling */
+.filter-section {
+    padding: 25px;
+    background-color: #fbfcfd;
+    border-bottom: 1px solid #e8ecf1;
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 220px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95em;
+}
+
+.filter-dropdown {
+    padding: 12px 16px;
+    font-size: 1em;
+    border: 2px solid #e0e6ed;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: white;
+    color: #333;
+}
+
+.filter-dropdown:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* Services container */
+.services-container {
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+    background-color: #ffffff;
+}
+
+/* Service card styling - Modern design */
+.service-card {
+    background: white;
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f3f7;
+}
+
+.service-card:hover {
+    box-shadow: 0 16px 40px rgba(102, 126, 234, 0.15), 0 8px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-8px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-bottom: none;
+}
+
+.card-header h2 {
+    color: white;
+    font-size: 1.35em;
+    margin: 0;
+    font-weight: 700;
+}
+
+.card-body {
+    padding: 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-color: #ffffff;
+}
+
+/* Card info item styling */
+.card-info-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.info-icon {
+    font-size: 1.4em;
+    min-width: 32px;
+    text-align: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    color: #2c3e50;
+    font-size: 0.98em;
+    font-weight: 500;
+}
+
+.card-footer {
+    padding: 20px 24px 24px 24px;
+    background-color: #fafbff;
+    border-top: 1px solid #f0f3f7;
+}
+
+/* Button group styling for multiple buttons */
+.button-group {
+    display: flex;
+    gap: 12px;
+}
+
+/* Call button styling */
+.call-button,
+.whatsapp-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 14px 20px;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.95em;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.call-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.call-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.call-button:active {
+    transform: translateY(-1px);
+}
+
+/* WhatsApp button styling */
+.whatsapp-button {
+    background: linear-gradient(135deg, #25d366 0%, #20a85f 100%);
+    color: white;
+}
+
+.whatsapp-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-button:active {
+    transform: translateY(-1px);
+}
+
+/* No results message */
+.no-results {
+    text-align: center;
+    padding: 60px 30px;
+    color: #999;
+    font-size: 1.1em;
+    grid-column: 1 / -1;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        border-radius: 16px;
+    }
+    
+    .header {
+        padding: 40px 20px;
+    }
+    
+    .header h1 {
+        font-size: 2.2em;
+        margin-bottom: 8px;
+    }
+    
+    .header p {
+        font-size: 1em;
+    }
+    
+    .search-section {
+        padding: 18px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .search-box {
+        padding: 12px 16px;
+        border-radius: 10px;
+    }
+    
+    .filter-section {
+        flex-direction: column;
+        gap: 12px;
+        padding: 18px;
+    }
+    
+    .filter-group {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .filter-dropdown {
+        width: 100%;
+        border-radius: 10px;
+    }
+    
+    .services-container {
+        padding: 20px;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .service-card {
+        border-radius: 14px;
+    }
+    
+    .card-header {
+        padding: 18px;
+    }
+    
+    .card-header h2 {
+        font-size: 1.2em;
+    }
+    
+    .card-body {
+        padding: 18px;
+        gap: 14px;
+    }
+    
+    .card-footer {
+        padding: 16px 18px 18px 18px;
+    }
+    
+    /* Enhanced mobile button sizing */
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .call-button,
+    .whatsapp-button {
+        padding: 15px 16px;
+        font-size: 1em;
+        min-height: 48px;
+        border-radius: 11px;
+    }
+    
+    .card-info-item {
+        padding: 6px 0;
+    }
+    
+    .info-icon {
+        font-size: 1.4em;
+    }
+    
+    .info-label {
+        font-size: 0.75em;
+    }
+    
+    .info-value {
+        font-size: 0.95em;
+    }
+}
