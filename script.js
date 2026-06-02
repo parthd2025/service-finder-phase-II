@@ -32,6 +32,9 @@ function loadProviders() {
             // Handle the data from Google Apps Script
             allProviders = data.services || data;  // Support both formats
             
+            // Filter to show only Active providers by default
+            allProviders = allProviders.filter(provider => provider.status === 'Active');
+            
             // Hide loading message
             loadingMessage.style.display = 'none';
             
@@ -41,6 +44,7 @@ function loadProviders() {
             // Populate filters after data loads
             populateServiceFilter();
             populateAreaFilter();
+            populateStatusFilter();
             
             // Add event listeners
             addEventListeners();
@@ -97,6 +101,34 @@ function populateAreaFilter() {
         option.textContent = area;        // Set the display text
         filterDropdown.appendChild(option);
     });
+}
+
+// Populate the status dropdown filter with unique statuses
+function populateStatusFilter() {
+    // Get unique statuses from all providers
+    const uniqueStatuses = [...new Set(allProviders.map(provider => provider.status))];
+    
+    // Get the dropdown element
+    const filterDropdown = document.getElementById('statusFilter');
+    
+    // Only proceed if the dropdown exists
+    if (!filterDropdown) return;
+    
+    // Clear existing options (keep the default "All Status" option)
+    while (filterDropdown.options.length > 1) {
+        filterDropdown.remove(1);
+    }
+    
+    // Add each unique status as an option
+    uniqueStatuses.forEach(status => {
+        const option = document.createElement('option');
+        option.value = status;            // Set the value
+        option.textContent = status;      // Set the display text
+        filterDropdown.appendChild(option);
+    });
+    
+    // Set default to "Active"
+    filterDropdown.value = 'Active';
 }
 
 // Display providers on the page
@@ -180,7 +212,11 @@ function applySearchAndFilter() {
     // Get selected area from dropdown
     const selectedArea = document.getElementById('areaFilter').value;
     
-    // Filter providers based on search, service type, AND area
+    // Get selected status from dropdown
+    const statusFilter = document.getElementById('statusFilter');
+    const selectedStatus = statusFilter ? statusFilter.value : 'Active';
+    
+    // Filter providers based on search, service type, area, AND status
     const filteredProviders = allProviders.filter(provider => {
         // Check if search text matches name, service, or area (if no search text, this passes)
         const matchesSearch = searchText === '' ||
@@ -194,8 +230,11 @@ function applySearchAndFilter() {
         // Check if area matches (if no filter selected, this passes)
         const matchesArea = selectedArea === '' || provider.area === selectedArea;
         
+        // Check if status matches (if no filter selected, this passes)
+        const matchesStatus = selectedStatus === '' || provider.status === selectedStatus;
+        
         // Return true only if ALL conditions are true
-        return matchesSearch && matchesServiceType && matchesArea;
+        return matchesSearch && matchesServiceType && matchesArea && matchesStatus;
     });
     
     // Display filtered providers
@@ -218,4 +257,12 @@ function addEventListeners() {
     document.getElementById('areaFilter').addEventListener('change', function() {
         applySearchAndFilter();
     });
+    
+    // Add event listener to status filter dropdown if it exists
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            applySearchAndFilter();
+        });
+    }
 }
