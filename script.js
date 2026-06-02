@@ -125,8 +125,9 @@ function createProviderCard(provider) {
     const card = document.createElement('div');
     card.className = 'service-card';
     
-    // Extract phone number digits only for WhatsApp link (remove +91- from phone)
-    const phoneDigits = provider.phone.replace(/\D/g, '');  // Remove all non-digits
+    // Convert phone to string and handle both string and number formats
+    const phoneStr = String(provider.phone).trim();
+    const phoneDigits = phoneStr.replace(/\D/g, '');  // Remove all non-digits
     const whatsappLink = `https://wa.me/${phoneDigits}`;
     
     // Add content to the card with provider information and Unicode icons
@@ -153,13 +154,13 @@ function createProviderCard(provider) {
                 <span class="info-icon">📱</span>
                 <div class="info-content">
                     <span class="info-label">Phone</span>
-                    <span class="info-value">${provider.phone}</span>
+                    <span class="info-value">${phoneStr}</span>
                 </div>
             </div>
         </div>
         <div class="card-footer">
             <div class="button-group">
-                <a href="tel:${provider.phone}" class="call-button">📞 Call Now</a>
+                <a href="tel:${phoneStr}" class="call-button">📞 Call Now</a>
                 <a href="${whatsappLink}" class="whatsapp-button" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
             </div>
         </div>
