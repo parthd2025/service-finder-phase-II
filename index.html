@@ -5,22 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Find trusted local service providers in Chhatrapati Sambhajinagar — electricians, plumbers, taxi, milk delivery and more.">
     <title>Chhatrapati Sambhajinagar Seva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header" id="home">
-            <div class="location-badge" aria-label="Service area">
-                📍 Chhatrapati Sambhajinagar (Aurangabad)
+    <div class="page-wrap">
+        <header class="site-header" id="home">
+            <div class="header-monument" aria-hidden="true">
+                <svg viewBox="0 0 320 140" preserveAspectRatio="xMidYMax meet">
+                    <path fill="currentColor" d="M160 8c-24 0-42 18-42 40v8h-10v84h104V56h-10v-8c0-22-18-40-42-40zm0 16c14 0 26 12 26 26v6h-52v-6c0-14 12-26 26-26zM78 60h18v72H78zm146 0h18v72h-18z"/>
+                    <ellipse cx="160" cy="32" rx="28" ry="16" fill="currentColor"/>
+                </svg>
             </div>
-            <h1>Chhatrapati Sambhajinagar Seva</h1>
-            <p class="tagline">Trusted Local Services Directory</p>
-            <p class="hero-subtitle">Find trusted electricians, plumbers, taxi services, milk services and other local professionals across Chhatrapati Sambhajinagar.</p>
+
+            <div class="top-bar">
+                <a class="brand" href="#home">
+                    <span class="brand-logo" aria-hidden="true">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M8 40V22l16-14 16 14v18H8z" fill="#3d0c0c"/>
+                            <path d="M14 40V26l10-8 10 8v14H14z" fill="#5D4037"/>
+                            <path d="M38 12l4-6 4 6-3 2z" fill="#f26522"/>
+                        </svg>
+                    </span>
+                    <span class="brand-text">
+                        <span class="brand-name" data-i18n="brandName">Chhatrapati Sambhajinagar Seva</span>
+                        <span class="brand-city" data-i18n="brandCity">Chhatrapati Sambhajinagar (Aurangabad)</span>
+                    </span>
+                </a>
+                <div class="top-bar-actions">
+                    <div class="lang-toggle" role="group" aria-label="Language" data-i18n-aria="langToggleLabel">
+                        <button type="button" id="langEn" class="lang-opt lang-active" aria-pressed="true">EN</button>
+                        <span class="lang-divider" aria-hidden="true">|</span>
+                        <button type="button" id="langMr" class="lang-opt" aria-pressed="false">मराठी</button>
+                    </div>
+                    <span class="top-location" data-i18n="topLocation">📍 Aurangabad</span>
+                </div>
+            </div>
         </header>
 
+        <section class="search-band" id="services">
+            <form class="search-form" role="search" onsubmit="return false;">
+                <div class="search-input-wrap">
+                    <span class="search-icon" aria-hidden="true">🔍</span>
+                    <input
+                        type="search"
+                        id="searchBox"
+                        class="search-input"
+                        data-i18n-placeholder="searchPlaceholder"
+                        placeholder="Search for a service or provider..."
+                        autocomplete="off"
+                    >
+                </div>
+                <select id="serviceFilter" class="search-select" aria-label="Service type">
+                    <option value="" data-i18n="allServices">All Services</option>
+                </select>
+                <select id="areaFilter" class="search-select" aria-label="Area">
+                    <option value="" data-i18n="allAreas">All Areas</option>
+                </select>
+                <button type="button" id="searchBtn" class="search-submit" data-i18n="searchBtn">🔍 Search</button>
+            </form>
+        </section>
+
+        <section class="category-row" aria-label="Service categories">
+            <button type="button" class="category-tile" data-service-filter="Electric">
+                <span class="cat-icon cat-electric">⚡</span>
+                <span class="cat-label" data-i18n="catElectrician">Electrician</span>
+            </button>
+            <button type="button" class="category-tile" data-service-filter="Plumb">
+                <span class="cat-icon cat-plumber">🔧</span>
+                <span class="cat-label" data-i18n="catPlumber">Plumber</span>
+            </button>
+            <button type="button" class="category-tile" data-service-filter="Carpent">
+                <span class="cat-icon cat-carpenter">🪚</span>
+                <span class="cat-label" data-i18n="catCarpenter">Carpenter</span>
+            </button>
+            <button type="button" class="category-tile" data-service-filter="Taxi">
+                <span class="cat-icon cat-taxi">🚕</span>
+                <span class="cat-label" data-i18n="catTaxi">City Taxi</span>
+            </button>
+            <button type="button" class="category-tile" data-service-filter="Auto">
+                <span class="cat-icon cat-auto">🛺</span>
+                <span class="cat-label" data-i18n="catAuto">Auto Services</span>
+            </button>
+            <button type="button" class="category-tile" data-service-filter="Milk">
+                <span class="cat-icon cat-milk">🥛</span>
+                <span class="cat-label" data-i18n="catMilk">Milk Service</span>
+            </button>
+            <button type="button" class="category-tile" data-service-filter="AC">
+                <span class="cat-icon cat-ac">❄️</span>
+                <span class="cat-label" data-i18n="catAc">AC Repair</span>
+            </button>
+            <button type="button" class="category-tile category-more" id="viewAllCategories">
+                <span class="cat-icon cat-more">⋯</span>
+                <span class="cat-label" data-i18n="catMore">More Services</span>
+            </button>
+        </section>
+
+        <section class="popular-section" aria-labelledby="popular-heading">
+            <div class="section-header">
+                <h2 id="popular-heading" class="section-heading">
+                    <span class="heading-star" aria-hidden="true">★</span>
+                    <span data-i18n="popularHeading">Popular Services in Chhatrapati Sambhajinagar</span>
+                </h2>
+                <a href="#allProviders" class="view-all-link" id="viewAllPopular" data-i18n="viewAll">View All</a>
+            </div>
+            <div id="popularList" class="popular-scroll" aria-live="polite"></div>
+        </section>
+
+        <section class="promo-banner" aria-label="About this directory">
+            <div class="promo-art" aria-hidden="true">
+                <svg viewBox="0 0 80 100" fill="none">
+                    <path d="M40 4c-12 0-22 10-22 22v6H8v68h64V32H62v-6c0-12-10-22-22-22zm0 10c6.5 0 12 5.5 12 12v4H28v-4c0-6.5 5.5-12 12-12z" fill="#3d0c0c" opacity="0.35"/>
+                </svg>
+            </div>
+            <p class="promo-text" data-i18n="promoText">Your trusted local service directory in Chhatrapati Sambhajinagar (Aurangabad).</p>
+            <span class="promo-flag" aria-hidden="true">🚩</span>
+        </section>
+
         <section class="area-chips-section" aria-label="Browse by area">
-            <p class="area-chips-label">Browse by area</p>
-            <div class="area-chips" role="group" aria-label="Area filters">
+            <p class="area-chips-label" data-i18n="browseByArea">Browse by area</p>
+            <div class="area-chips" role="group">
                 <button type="button" class="area-chip" data-area="CIDCO">CIDCO</button>
                 <button type="button" class="area-chip" data-area="Garkheda">Garkheda</button>
                 <button type="button" class="area-chip" data-area="Mukundwadi">Mukundwadi</button>
@@ -32,94 +138,119 @@
             </div>
         </section>
 
-        <main id="services">
-            <div class="search-section">
-                <label for="searchBox" class="visually-hidden">Search providers</label>
-                <input
-                    type="search"
-                    id="searchBox"
-                    class="search-box"
-                    placeholder="Search by provider name, service type, or area..."
-                    autocomplete="off"
-                >
-            </div>
-
-            <div class="filter-section">
-                <div class="filter-group">
-                    <label for="serviceFilter">Filter by Service Type</label>
-                    <select id="serviceFilter" class="filter-dropdown">
-                        <option value="">All Services</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="areaFilter">Filter by Area</label>
-                    <select id="areaFilter" class="filter-dropdown">
-                        <option value="">All Areas</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="statusFilter">Filter by Status</label>
-                    <select id="statusFilter" class="filter-dropdown">
-                        <option value="">All Status</option>
+        <main class="listings-section" id="allProviders">
+            <div class="listings-header">
+                <h2 class="section-heading" data-i18n="allProviders">All Service Providers</h2>
+                <div class="status-filter-wrap">
+                    <label for="statusFilter" class="visually-hidden">Status</label>
+                    <select id="statusFilter" class="status-select">
+                        <option value="" data-i18n="allStatus">All Status</option>
                     </select>
                 </div>
             </div>
 
-            <div id="loadingMessage" class="loading-message" role="status">
+            <div id="loadingMessage" class="loading-message" role="status" data-i18n="loading">
                 ⏳ Loading service providers...
             </div>
-
-            <div id="errorMessage" class="error-message" role="alert" hidden>
+            <div id="errorMessage" class="error-message" role="alert" hidden data-i18n="error">
                 ❌ Error loading data. Please try refreshing the page.
             </div>
-
-            <div id="servicesList" class="services-container" aria-live="polite">
-            </div>
+            <div id="servicesList" class="services-grid" aria-live="polite"></div>
         </main>
+
+        <section class="stats-section" aria-label="Platform statistics">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value" id="statProviders">—</span>
+                    <span class="stat-label" data-i18n="statProviders">Active Providers</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statServices">—</span>
+                    <span class="stat-label" data-i18n="statServices">Service Categories</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statAreas">—</span>
+                    <span class="stat-label" data-i18n="statAreas">Areas Covered</span>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <footer class="footer" id="contact">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Chhatrapati Sambhajinagar Seva</h3>
-                <p>Trusted directory for electricians, plumbers, transport, milk delivery and more across the city.</p>
-            </div>
-
-            <nav class="footer-section" aria-label="Quick links">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
-
-            <nav class="footer-section" aria-label="Popular services">
-                <h4>Popular Services</h4>
-                <ul>
-                    <li><a href="#services" data-service-filter="Electrician">Electricians</a></li>
-                    <li><a href="#services" data-service-filter="Plumber">Plumbers</a></li>
-                    <li><a href="#services" data-service-filter="Taxi">Taxi Services</a></li>
-                    <li><a href="#services" data-service-filter="Milk">Milk Services</a></li>
-                </ul>
-            </nav>
-
-            <div class="footer-section">
-                <h4>Contact</h4>
-                <p>📍 Chhatrapati Sambhajinagar, Maharashtra</p>
-                <p>📧 info@sambhajinagarseva.com</p>
-                <p>📱 Phone: Coming Soon</p>
-            </div>
+    <footer class="site-footer" id="contact">
+        <div class="footer-monument" aria-hidden="true">
+            <svg viewBox="0 0 400 70" preserveAspectRatio="xMidYMax meet">
+                <path fill="currentColor" d="M200 4c-26 0-46 20-46 44v6h-12v16h116V54h-12v-6c0-24-20-44-46-44zm0 16c16 0 28 12 28 28v4H172v-4c0-16 12-28 28-28z"/>
+            </svg>
         </div>
-
-        <div class="footer-bottom">
-            <p class="footer-heart">Made with ❤️ in Chhatrapati Sambhajinagar</p>
-            <p>&copy; <span id="footerYear"></span> Chhatrapati Sambhajinagar Seva. All rights reserved.</p>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand-block">
+                    <div class="footer-logo-row">
+                        <span class="brand-logo footer-logo" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M8 40V22l16-14 16 14v18H8z" fill="#FFB366"/>
+                                <path d="M38 12l4-6 4 6-3 2z" fill="#f26522"/>
+                            </svg>
+                        </span>
+                        <span class="footer-brand-name" data-i18n="brandName">Chhatrapati Sambhajinagar Seva</span>
+                    </div>
+                    <p class="footer-tagline" data-i18n="footerTagline">Find trusted local services near you.</p>
+                </div>
+                <div class="footer-social">
+                    <span class="footer-social-label" data-i18n="followUs">Follow Us</span>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon" aria-label="Facebook">f</a>
+                        <a href="#" class="social-icon" aria-label="Instagram">◎</a>
+                        <a href="#" class="social-icon social-wa" aria-label="WhatsApp">✓</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-columns">
+                <nav class="footer-col" aria-label="Quick links">
+                    <h4 data-i18n="quickLinks">Quick Links</h4>
+                    <ul>
+                        <li><a href="#home" data-i18n="linkHome">Home</a></li>
+                        <li><a href="#allProviders" data-i18n="linkAllServices">All Services</a></li>
+                        <li><a href="#services" data-i18n="linkSearch">Search</a></li>
+                        <li><a href="#contact" data-i18n="linkContact">Contact Us</a></li>
+                    </ul>
+                </nav>
+                <nav class="footer-col" aria-label="Popular services">
+                    <h4 data-i18n="popularServices">Popular Services</h4>
+                    <ul>
+                        <li><a href="#services" data-service-filter="Electric" data-i18n="linkElectrician">Electrician</a></li>
+                        <li><a href="#services" data-service-filter="Plumb" data-i18n="linkPlumber">Plumber</a></li>
+                        <li><a href="#services" data-service-filter="Carpent" data-i18n="linkCarpenter">Carpenter</a></li>
+                        <li><a href="#services" data-service-filter="Taxi" data-i18n="linkTaxi">Taxi Services</a></li>
+                        <li><a href="#services" data-service-filter="Milk" data-i18n="linkMilk">Milk Service</a></li>
+                    </ul>
+                </nav>
+                <nav class="footer-col" aria-label="For providers">
+                    <h4 data-i18n="forProviders">For Providers</h4>
+                    <ul>
+                        <li><a href="#contact" data-i18n="listBusiness">List Your Business</a></li>
+                        <li><a href="#contact" data-i18n="updateListing">Update Listing</a></li>
+                        <li><a href="#contact" data-i18n="support">Support</a></li>
+                        <li><a href="#contact" data-i18n="terms">Terms &amp; Conditions</a></li>
+                    </ul>
+                </nav>
+                <div class="footer-col">
+                    <h4 data-i18n="contactInfo">Contact Information</h4>
+                    <ul class="footer-contact-list">
+                        <li data-i18n="contactLocation">📍 Chhatrapati Sambhajinagar, Maharashtra</li>
+                        <li data-i18n="contactEmail">📧 info@sambhajinagarseva.com</li>
+                        <li data-i18n="phoneComingSoon">📱 Phone: Coming Soon</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-heart" data-i18n="madeWithLove">Made with ❤️ in Chhatrapati Sambhajinagar</p>
+                <p class="footer-copy">&copy; <span id="footerYear"></span> <span data-i18n="copyright">Chhatrapati Sambhajinagar Seva — Chhatrapati Sambhajinagar (Aurangabad). All rights reserved.</span></p>
+            </div>
         </div>
     </footer>
 
+    <script src="i18n.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

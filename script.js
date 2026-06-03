@@ -4,16 +4,184 @@ let allProviders = [];
 // Google Apps Script URL
 const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZJmQJRr3swLELNHmJd3xkw5DwJKR_whAnux-Chk_nypn_O1MQCxZvHbpfr2EEEKoH/exec';
 
-// Run when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    initI18n();
+
     const yearEl = document.getElementById('footerYear');
     if (yearEl) {
         yearEl.textContent = new Date().getFullYear();
     }
+
+    window.onLanguageChange = refreshUiForLanguage;
+
     initAreaChips();
+    initCategoryTiles();
     initFooterServiceLinks();
+    initSearchButton();
+    initViewAllLinks();
     loadProviders();
 });
+
+function updateSelectDefaults() {
+    const serviceFilter = document.getElementById('serviceFilter');
+    const areaFilter = document.getElementById('areaFilter');
+    const statusFilter = document.getElementById('statusFilter');
+
+    if (serviceFilter && serviceFilter.options[0]) {
+        serviceFilter.options[0].textContent = t('allServices');
+    }
+    if (areaFilter && areaFilter.options[0]) {
+        areaFilter.options[0].textContent = t('allAreas');
+    }
+    if (statusFilter && statusFilter.options[0]) {
+        statusFilter.options[0].textContent = t('allStatus');
+    }
+}
+
+function refreshFilterOptionLabels() {
+    const serviceFilter = document.getElementById('serviceFilter');
+    const statusFilter = document.getElementById('statusFilter');
+
+    const areaFilter = document.getElementById('areaFilter');
+
+    if (serviceFilter) {
+        for (let i = 1; i < serviceFilter.options.length; i++) {
+            const opt = serviceFilter.options[i];
+            opt.textContent = translateServiceLabel(opt.value);
+        }
+    }
+
+    if (areaFilter) {
+        for (let i = 1; i < areaFilter.options.length; i++) {
+            const opt = areaFilter.options[i];
+            opt.textContent = translateAreaLabel(opt.value);
+        }
+    }
+
+    if (statusFilter) {
+        for (let i = 1; i < statusFilter.options.length; i++) {
+            const opt = statusFilter.options[i];
+            opt.textContent = translateStatusLabel(opt.value);
+        }
+    }
+}
+
+function refreshUiForLanguage() {
+    updateSelectDefaults();
+    refreshFilterOptionLabels();
+
+    const loadingMessage = document.getElementById('loadingMessage');
+    if (loadingMessage && loadingMessage.style.display !== 'none') {
+        loadingMessage.textContent = t('loading');
+    }
+
+    const errorMessage = document.getElementById('errorMessage');
+    if (errorMessage && !errorMessage.hidden) {
+        errorMessage.textContent = t('error');
+    }
+
+    if (allProviders.length > 0) {
+        displayPopularProviders();
+        applySearchAndFilter();
+    }
+}
+
+function escapeHtml(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function getInitials(name) {
+    const displayName = translateProviderName(name);
+    const words = displayName.split(/\s+/).filter(Boolean);
+    if (words.length === 0) return '?';
+
+    if (currentLang === 'mr') {
+        return words
+            .slice(0, 2)
+            .map(word => word.charAt(0))
+            .join('');
+    }
+
+    return name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(word => word[0])
+        .join('')
+        .toUpperCase() || '?';
+}
+
+function getServiceClass(service) {
+    const s = (service || '').toLowerCase();
+    if (s.includes('electric')) return 'service-electric';
+    if (s.includes('plumb')) return 'service-plumber';
+    if (s.includes('carpent')) return 'service-carpenter';
+    if (s.includes('taxi') || s.includes('cab')) return 'service-taxi';
+    if (s.includes('auto') || s.includes('rickshaw')) return 'service-auto';
+    if (s.includes('milk')) return 'service-milk';
+    if (s.includes('ac') || s.includes('air')) return 'service-ac';
+    return 'service-default';
+}
+
+function setServiceFilterByKeyword(keyword) {
+    const serviceFilter = document.getElementById('serviceFilter');
+    if (!serviceFilter || !keyword) return false;
+
+    const match = [...serviceFilter.options].find(
+        opt => opt.value && opt.value.toLowerCase().includes(keyword.toLowerCase())
+    );
+    serviceFilter.value = match ? match.value : '';
+    return Boolean(match);
+}
+
+function initCategoryTiles() {
+    document.querySelectorAll('.category-tile[data-service-filter]').forEach(tile => {
+        tile.addEventListener('click', function() {
+            const keyword = this.getAttribute('data-service-filter');
+            document.querySelectorAll('.category-tile').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            setServiceFilterByKeyword(keyword);
+            applySearchAndFilter();
+            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+}
+
+function initSearchButton() {
+    const searchBtn = document.getElementById('searchBtn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', applySearchAndFilter);
+    }
+}
+
+function initViewAllLinks() {
+    const viewAllPopular = document.getElementById('viewAllPopular');
+    const viewAllCategories = document.getElementById('viewAllCategories');
+
+    function scrollToListings() {
+        document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    if (viewAllPopular) {
+        viewAllPopular.addEventListener('click', function(e) {
+            e.preventDefault();
+            scrollToListings();
+        });
+    }
+
+    if (viewAllCategories) {
+        viewAllCategories.addEventListener('click', function() {
+            document.getElementById('serviceFilter').value = '';
+            document.querySelectorAll('.category-tile').forEach(t => t.classList.remove('active'));
+            applySearchAndFilter();
+            scrollToListings();
+        });
+    }
+}
 
 function initAreaChips() {
     const chips = document.querySelectorAll('.area-chip');
@@ -47,278 +215,242 @@ function initAreaChips() {
     }
 }
 
+function getActiveProviders() {
+    return allProviders.filter(provider => provider.status === 'Active');
+}
+
+function updateStatistics(providers) {
+    const statProviders = document.getElementById('statProviders');
+    const statServices = document.getElementById('statServices');
+    const statAreas = document.getElementById('statAreas');
+    if (!statProviders) return;
+
+    const serviceCount = new Set(providers.map(p => p.service).filter(Boolean)).size;
+    const areaCount = new Set(providers.map(p => p.area).filter(Boolean)).size;
+
+    statProviders.textContent = providers.length;
+    statServices.textContent = serviceCount;
+    statAreas.textContent = areaCount;
+}
+
 function initFooterServiceLinks() {
     document.querySelectorAll('[data-service-filter]').forEach(link => {
+        if (link.classList.contains('category-tile')) return;
+
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            const serviceFilter = document.getElementById('serviceFilter');
             const value = this.getAttribute('data-service-filter');
-            if (!serviceFilter) return;
-
-            const match = [...serviceFilter.options].find(
-                opt => opt.value.toLowerCase().includes(value.toLowerCase())
-            );
-            serviceFilter.value = match ? match.value : '';
+            setServiceFilterByKeyword(value);
             applySearchAndFilter();
             document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
         });
     });
 }
 
-// Load provider data from Google Apps Script URL
 function loadProviders() {
-    // Show loading message
     const loadingMessage = document.getElementById('loadingMessage');
     const errorMessage = document.getElementById('errorMessage');
     const servicesList = document.getElementById('servicesList');
-    
+
     loadingMessage.style.display = 'block';
     errorMessage.hidden = true;
     servicesList.innerHTML = '';
-    
-    // Use fetch to get data from Google Apps Script
+
     fetch(GOOGLE_APPS_SCRIPT_URL)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.json();  // Convert response to JSON
+            return response.json();
         })
         .then(data => {
-            // Handle the data from Google Apps Script
-            allProviders = data.services || data;  // Support both formats
-            
-            // Filter to show only Active providers by default
-            allProviders = allProviders.filter(provider => provider.status === 'Active');
-            
-            // Hide loading message
+            allProviders = data.services || data;
+
             loadingMessage.style.display = 'none';
-            
-            // Display providers
-            displayProviders(allProviders);
-            
-            // Populate filters after data loads
+
             populateServiceFilter();
             populateAreaFilter();
             populateStatusFilter();
-            
-            // Add event listeners
+
             addEventListeners();
+            applySearchAndFilter();
+            displayPopularProviders();
+            updateStatistics(getActiveProviders());
         })
         .catch(error => {
             console.error('Error loading providers:', error);
-            
-            // Hide loading, show error
             loadingMessage.style.display = 'none';
             errorMessage.hidden = false;
             servicesList.innerHTML = '';
+            const popularList = document.getElementById('popularList');
+            if (popularList) popularList.innerHTML = '';
         });
 }
 
-// Populate the service type dropdown filter with unique services
 function populateServiceFilter() {
-    // Get unique service types from all providers
     const uniqueServices = [...new Set(allProviders.map(provider => provider.service))];
-    
-    // Get the dropdown element
     const filterDropdown = document.getElementById('serviceFilter');
-    
-    // Clear existing options (keep the default "All Services" option)
+
     while (filterDropdown.options.length > 1) {
         filterDropdown.remove(1);
     }
-    
-    // Add each unique service as an option
+
     uniqueServices.forEach(service => {
         const option = document.createElement('option');
-        option.value = service;           // Set the value
-        option.textContent = service;     // Set the display text
+        option.value = service;
+        option.textContent = translateServiceLabel(service);
         filterDropdown.appendChild(option);
     });
+
+    updateSelectDefaults();
 }
 
-// Populate the area dropdown filter with unique areas
 function populateAreaFilter() {
-    // Get unique areas from all providers
     const uniqueAreas = [...new Set(allProviders.map(provider => provider.area))];
-    
-    // Get the dropdown element
     const filterDropdown = document.getElementById('areaFilter');
-    
-    // Clear existing options (keep the default "All Areas" option)
+
     while (filterDropdown.options.length > 1) {
         filterDropdown.remove(1);
     }
-    
-    // Add each unique area as an option
+
     uniqueAreas.forEach(area => {
         const option = document.createElement('option');
-        option.value = area;              // Set the value
-        option.textContent = area;        // Set the display text
+        option.value = area;
+        option.textContent = translateAreaLabel(area);
         filterDropdown.appendChild(option);
     });
+
+    updateSelectDefaults();
 }
 
-// Populate the status dropdown filter with unique statuses
 function populateStatusFilter() {
-    // Get unique statuses from all providers
-    const uniqueStatuses = [...new Set(allProviders.map(provider => provider.status))];
-    
-    // Get the dropdown element
+    const uniqueStatuses = [...new Set(allProviders.map(provider => provider.status).filter(Boolean))];
     const filterDropdown = document.getElementById('statusFilter');
-    
-    // Only proceed if the dropdown exists
+
     if (!filterDropdown) return;
-    
-    // Clear existing options (keep the default "All Status" option)
+
     while (filterDropdown.options.length > 1) {
         filterDropdown.remove(1);
     }
-    
-    // Add each unique status as an option
-    uniqueStatuses.forEach(status => {
+
+    uniqueStatuses.sort().forEach(status => {
         const option = document.createElement('option');
-        option.value = status;            // Set the value
-        option.textContent = status;      // Set the display text
+        option.value = status;
+        option.textContent = translateStatusLabel(status);
         filterDropdown.appendChild(option);
     });
-    
-    // Set default to "Active"
-    filterDropdown.value = 'Active';
+
+    // Default: show Active only; user can choose "All Status" for every provider
+    if ([...filterDropdown.options].some(opt => opt.value === 'Active')) {
+        filterDropdown.value = 'Active';
+    } else {
+        filterDropdown.value = '';
+    }
+
+    updateSelectDefaults();
 }
 
-// Display providers on the page
-function displayProviders(providers) {
-    const servicesList = document.getElementById('servicesList');
-    
-    // Clear any previous content
-    servicesList.innerHTML = '';
-    
-    // Check if there are any providers to display
-    if (providers.length === 0) {
-        servicesList.innerHTML = '<p class="no-results">No service providers found.</p>';
+function displayPopularProviders() {
+    const popularList = document.getElementById('popularList');
+    if (!popularList) return;
+
+    popularList.innerHTML = '';
+    const popular = getActiveProviders().slice(0, 5);
+
+    if (popular.length === 0) {
+        popularList.innerHTML = `<p class="popular-empty">${escapeHtml(t('popularEmpty'))}</p>`;
         return;
     }
-    
-    // Create a card for each provider and add to page
-    providers.forEach(provider => {
-        const card = createProviderCard(provider);
-        servicesList.appendChild(card);
+
+    popular.forEach(provider => {
+        popularList.appendChild(createProviderCard(provider));
     });
 }
 
-// Create a provider card element
+function displayProviders(providers) {
+    const servicesList = document.getElementById('servicesList');
+    servicesList.innerHTML = '';
+
+    if (providers.length === 0) {
+        servicesList.innerHTML = `<p class="no-results">${escapeHtml(t('noResults'))}</p>`;
+        return;
+    }
+
+    providers.forEach(provider => {
+        servicesList.appendChild(createProviderCard(provider));
+    });
+}
+
 function createProviderCard(provider) {
-    // Create a new div for the card
-    const card = document.createElement('div');
-    card.className = 'service-card';
-    
-    // Convert phone to string and handle both string and number formats
+    const card = document.createElement('article');
+    card.className = 'provider-card';
+
     const phoneStr = String(provider.phone).trim();
-    const phoneDigits = phoneStr.replace(/\D/g, '');  // Remove all non-digits
+    const phoneDigits = phoneStr.replace(/\D/g, '');
     const whatsappLink = `https://wa.me/${phoneDigits}`;
-    
-    // Add content to the card with provider information and Unicode icons
+    const serviceClass = getServiceClass(provider.service);
+
     card.innerHTML = `
-        <div class="card-header">
-            <h2>🏢 ${provider.name}</h2>
-        </div>
-        <div class="card-body">
-            <div class="card-info-item">
-                <span class="info-icon">🔧</span>
-                <div class="info-content">
-                    <span class="info-label">Service Type</span>
-                    <span class="info-value">${provider.service}</span>
-                </div>
-            </div>
-            <div class="card-info-item">
-                <span class="info-icon">📍</span>
-                <div class="info-content">
-                    <span class="info-label">Area</span>
-                    <span class="info-value">${provider.area}</span>
-                </div>
-            </div>
-            <div class="card-info-item">
-                <span class="info-icon">📱</span>
-                <div class="info-content">
-                    <span class="info-label">Phone</span>
-                    <span class="info-value">${phoneStr}</span>
-                </div>
+        <div class="card-top">
+            <div class="card-avatar" aria-hidden="true">${escapeHtml(getInitials(provider.name))}</div>
+            <div class="card-meta">
+                <h3 class="card-name">${escapeHtml(translateProviderName(provider.name))}</h3>
+                <p class="card-service ${serviceClass}">${escapeHtml(translateServiceLabel(provider.service))}</p>
+                <p class="card-location">📍 ${escapeHtml(translateAreaLabel(provider.area))}</p>
             </div>
         </div>
-        <div class="card-footer">
-            <div class="button-group">
-                <a href="tel:${phoneStr}" class="call-button">📞 Call Now</a>
-                <a href="${whatsappLink}" class="whatsapp-button" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
-            </div>
+        <div class="card-actions">
+            <a href="tel:${escapeHtml(phoneStr)}" class="btn-call">${escapeHtml(t('call'))}</a>
+            <a href="${whatsappLink}" class="btn-whatsapp" target="_blank" rel="noopener noreferrer">${escapeHtml(t('whatsapp'))}</a>
         </div>
     `;
-    
+
     return card;
 }
 
-// Function to apply search and both filters
 function applySearchAndFilter() {
-    // Get search text from search box
     const searchText = document.getElementById('searchBox').value.toLowerCase();
-    
-    // Get selected service type from dropdown
     const selectedService = document.getElementById('serviceFilter').value;
-    
-    // Get selected area from dropdown
     const selectedArea = document.getElementById('areaFilter').value;
-    
-    // Get selected status from dropdown
     const statusFilter = document.getElementById('statusFilter');
-    const selectedStatus = statusFilter ? statusFilter.value : 'Active';
-    
-    // Filter providers based on search, service type, area, AND status
+    // Empty value = "All Status" (show every provider)
+    const selectedStatus = statusFilter ? statusFilter.value : '';
+
     const filteredProviders = allProviders.filter(provider => {
-        // Check if search text matches name, service, or area (if no search text, this passes)
         const matchesSearch = searchText === '' ||
             provider.name.toLowerCase().includes(searchText) ||
+            translateProviderName(provider.name).toLowerCase().includes(searchText) ||
             provider.service.toLowerCase().includes(searchText) ||
-            provider.area.toLowerCase().includes(searchText);
-        
-        // Check if service type matches (if no filter selected, this passes)
+            translateServiceLabel(provider.service).toLowerCase().includes(searchText) ||
+            provider.area.toLowerCase().includes(searchText) ||
+            translateAreaLabel(provider.area).toLowerCase().includes(searchText);
+
         const matchesServiceType = selectedService === '' || provider.service === selectedService;
-        
-        // Check if area matches (if no filter selected, this passes)
         const matchesArea = selectedArea === '' || provider.area === selectedArea;
-        
-        // Check if status matches (if no filter selected, this passes)
         const matchesStatus = selectedStatus === '' || provider.status === selectedStatus;
-        
-        // Return true only if ALL conditions are true
+
         return matchesSearch && matchesServiceType && matchesArea && matchesStatus;
     });
-    
-    // Display filtered providers
+
     displayProviders(filteredProviders);
 }
 
-// Function to add event listeners to search and filter elements
 function addEventListeners() {
-    // Add event listener to search box for real-time filtering
-    document.getElementById('searchBox').addEventListener('input', function() {
-        applySearchAndFilter();
-    });
+    document.getElementById('searchBox').addEventListener('input', applySearchAndFilter);
 
-    // Add event listener to service filter dropdown
     document.getElementById('serviceFilter').addEventListener('change', function() {
+        document.querySelectorAll('.category-tile[data-service-filter]').forEach(tile => {
+            const keyword = tile.getAttribute('data-service-filter');
+            const active = this.value && this.value.toLowerCase().includes(keyword.toLowerCase());
+            tile.classList.toggle('active', active);
+        });
         applySearchAndFilter();
     });
 
-    // Add event listener to area filter dropdown
-    document.getElementById('areaFilter').addEventListener('change', function() {
-        applySearchAndFilter();
-    });
-    
-    // Add event listener to status filter dropdown if it exists
+    document.getElementById('areaFilter').addEventListener('change', applySearchAndFilter);
+
     const statusFilter = document.getElementById('statusFilter');
     if (statusFilter) {
-        statusFilter.addEventListener('change', function() {
-            applySearchAndFilter();
-        });
+        statusFilter.addEventListener('change', applySearchAndFilter);
     }
 }
