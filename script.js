@@ -6,8 +6,64 @@ const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZJmQJR
 
 // Run when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    const yearEl = document.getElementById('footerYear');
+    if (yearEl) {
+        yearEl.textContent = new Date().getFullYear();
+    }
+    initAreaChips();
+    initFooterServiceLinks();
     loadProviders();
 });
+
+function initAreaChips() {
+    const chips = document.querySelectorAll('.area-chip');
+    const areaFilter = document.getElementById('areaFilter');
+
+    chips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            const area = this.getAttribute('data-area');
+            const isActive = this.classList.contains('active');
+
+            chips.forEach(c => c.classList.remove('active'));
+
+            if (isActive) {
+                if (areaFilter) areaFilter.value = '';
+            } else {
+                this.classList.add('active');
+                if (areaFilter) areaFilter.value = area;
+            }
+
+            applySearchAndFilter();
+        });
+    });
+
+    if (areaFilter) {
+        areaFilter.addEventListener('change', function() {
+            const selected = this.value;
+            chips.forEach(chip => {
+                chip.classList.toggle('active', chip.getAttribute('data-area') === selected);
+            });
+        });
+    }
+}
+
+function initFooterServiceLinks() {
+    document.querySelectorAll('[data-service-filter]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const serviceFilter = document.getElementById('serviceFilter');
+            const value = this.getAttribute('data-service-filter');
+            if (!serviceFilter) return;
+
+            const match = [...serviceFilter.options].find(
+                opt => opt.value.toLowerCase().includes(value.toLowerCase())
+            );
+            serviceFilter.value = match ? match.value : '';
+            applySearchAndFilter();
+            document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+}
 
 // Load provider data from Google Apps Script URL
 function loadProviders() {
@@ -17,7 +73,7 @@ function loadProviders() {
     const servicesList = document.getElementById('servicesList');
     
     loadingMessage.style.display = 'block';
-    errorMessage.style.display = 'none';
+    errorMessage.hidden = true;
     servicesList.innerHTML = '';
     
     // Use fetch to get data from Google Apps Script
@@ -54,7 +110,7 @@ function loadProviders() {
             
             // Hide loading, show error
             loadingMessage.style.display = 'none';
-            errorMessage.style.display = 'block';
+            errorMessage.hidden = false;
             servicesList.innerHTML = '';
         });
 }

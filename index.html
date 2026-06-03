@@ -3,70 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Finder</title>
+    <meta name="description" content="Find trusted local service providers in Chhatrapati Sambhajinagar — electricians, plumbers, taxi, milk delivery and more.">
+    <title>Chhatrapati Sambhajinagar Seva</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Main Container -->
     <div class="container">
-        <!-- Header Section -->
-        <header class="header">
-            <h1>Service Finder</h1>
-            <p>Find the best service providers in your area</p>
+        <header class="header" id="home">
+            <div class="location-badge" aria-label="Service area">
+                📍 Chhatrapati Sambhajinagar (Aurangabad)
+            </div>
+            <h1>Chhatrapati Sambhajinagar Seva</h1>
+            <p class="tagline">Trusted Local Services Directory</p>
+            <p class="hero-subtitle">Find trusted electricians, plumbers, taxi services, milk services and other local professionals across Chhatrapati Sambhajinagar.</p>
         </header>
 
-        <!-- Search Box Section -->
-        <div class="search-section">
-            <input 
-                type="text" 
-                id="searchBox" 
-                class="search-box" 
-                placeholder="Search by provider name, service type, or area..."
-            >
-        </div>
+        <section class="area-chips-section" aria-label="Browse by area">
+            <p class="area-chips-label">Browse by area</p>
+            <div class="area-chips" role="group" aria-label="Area filters">
+                <button type="button" class="area-chip" data-area="CIDCO">CIDCO</button>
+                <button type="button" class="area-chip" data-area="Garkheda">Garkheda</button>
+                <button type="button" class="area-chip" data-area="Mukundwadi">Mukundwadi</button>
+                <button type="button" class="area-chip" data-area="Satara">Satara</button>
+                <button type="button" class="area-chip" data-area="Osmanpura">Osmanpura</button>
+                <button type="button" class="area-chip" data-area="Jalna Road">Jalna Road</button>
+                <button type="button" class="area-chip" data-area="Beed Bypass">Beed Bypass</button>
+                <button type="button" class="area-chip" data-area="Shahnoorwadi">Shahnoorwadi</button>
+            </div>
+        </section>
 
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="filter-group">
-                <label for="serviceFilter">Filter by Service Type:</label>
-                <select id="serviceFilter" class="filter-dropdown">
-                    <option value="">All Services</option>
-                    <!-- Service options will be added here by JavaScript -->
-                </select>
+        <main id="services">
+            <div class="search-section">
+                <label for="searchBox" class="visually-hidden">Search providers</label>
+                <input
+                    type="search"
+                    id="searchBox"
+                    class="search-box"
+                    placeholder="Search by provider name, service type, or area..."
+                    autocomplete="off"
+                >
             </div>
 
-            <div class="filter-group">
-                <label for="areaFilter">Filter by Area:</label>
-                <select id="areaFilter" class="filter-dropdown">
-                    <option value="">All Areas</option>
-                    <!-- Area options will be added here by JavaScript -->
-                </select>
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="serviceFilter">Filter by Service Type</label>
+                    <select id="serviceFilter" class="filter-dropdown">
+                        <option value="">All Services</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="areaFilter">Filter by Area</label>
+                    <select id="areaFilter" class="filter-dropdown">
+                        <option value="">All Areas</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="statusFilter">Filter by Status</label>
+                    <select id="statusFilter" class="filter-dropdown">
+                        <option value="">All Status</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="filter-group">
-                <label for="statusFilter">Filter by Status:</label>
-                <select id="statusFilter" class="filter-dropdown">
-                    <option value="">All Status</option>
-                    <!-- Status options will be added here by JavaScript -->
-                </select>
+            <div id="loadingMessage" class="loading-message" role="status">
+                ⏳ Loading service providers...
             </div>
-        </div>
 
-        <!-- Loading Message -->
-        <div id="loadingMessage" class="loading-message">
-            ⏳ Loading service providers...
-        </div>
+            <div id="errorMessage" class="error-message" role="alert" hidden>
+                ❌ Error loading data. Please try refreshing the page.
+            </div>
 
-        <!-- Error Message -->
-        <div id="errorMessage" class="error-message" style="display: none;">
-            ❌ Error loading data. Please try refreshing the page.
-        </div>
-
-        <!-- Service Providers Display Section -->
-        <div id="servicesList" class="services-container">
-            <!-- Provider cards are dynamically created here by JavaScript -->
-        </div>
+            <div id="servicesList" class="services-container" aria-live="polite">
+            </div>
+        </main>
     </div>
+
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Chhatrapati Sambhajinagar Seva</h3>
+                <p>Trusted directory for electricians, plumbers, transport, milk delivery and more across the city.</p>
+            </div>
+
+            <nav class="footer-section" aria-label="Quick links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+
+            <nav class="footer-section" aria-label="Popular services">
+                <h4>Popular Services</h4>
+                <ul>
+                    <li><a href="#services" data-service-filter="Electrician">Electricians</a></li>
+                    <li><a href="#services" data-service-filter="Plumber">Plumbers</a></li>
+                    <li><a href="#services" data-service-filter="Taxi">Taxi Services</a></li>
+                    <li><a href="#services" data-service-filter="Milk">Milk Services</a></li>
+                </ul>
+            </nav>
+
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>📍 Chhatrapati Sambhajinagar, Maharashtra</p>
+                <p>📧 info@sambhajinagarseva.com</p>
+                <p>📱 Phone: Coming Soon</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p class="footer-heart">Made with ❤️ in Chhatrapati Sambhajinagar</p>
+            <p>&copy; <span id="footerYear"></span> Chhatrapati Sambhajinagar Seva. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
