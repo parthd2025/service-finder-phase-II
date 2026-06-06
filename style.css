@@ -898,9 +898,9 @@ body.lang-mr .footer-brand-name {
 
 /* —— Stats —— */
 .stats-section {
-    padding: 24px 16px;
+    padding: 20px 16px 16px;
     background: var(--cream-dark);
-    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
 .stats-grid {
