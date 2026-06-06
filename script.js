@@ -420,8 +420,9 @@ function createProviderCard(provider, isFeatured) {
     const whatsappLink = 'https://wa.me/' + phoneDigits;
 
     const address = String(provider.address || '').trim();
-    const displayAddress = (address && address.toLowerCase() !== 'undefined')
-        ? escapeHtml(address)
+    const translatedAddress = address ? translateAreaLabel(address) : '';
+    const displayAddress = (translatedAddress && translatedAddress.toLowerCase() !== 'undefined')
+        ? escapeHtml(translatedAddress)
         : t('addressNotAvailable');
 
     const rawArea     = provider.area || '';

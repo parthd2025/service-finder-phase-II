@@ -478,10 +478,14 @@ function translateAreaLabel(area) {
     // Words containing digits (e.g. "N4") or single characters (e.g. "N") are kept as-is.
     const words = area.trim().split(/\s+/);
     const result = words.map(function(word) {
-        if (/\d/.test(word) || word.length === 1) return word;
-        const wl = word.toLowerCase();
-        if (AREA_LABELS_MR[wl]) return AREA_LABELS_MR[wl];
-        return transliterateWord(word);
+        // Strip surrounding punctuation (commas, dots, dashes) but preserve for rejoining
+        const leadingPunct  = word.match(/^[,.\-–—;:]+/) ? word.match(/^[,.\-–—;:]+/)[0] : '';
+        const trailingPunct = word.match(/[,.\-–—;:]+$/) ? word.match(/[,.\-–—;:]+$/)[0] : '';
+        const core = word.slice(leadingPunct.length, word.length - trailingPunct.length);
+        if (!core || /\d/.test(core) || core.length === 1) return word;
+        const cl = core.toLowerCase();
+        if (AREA_LABELS_MR[cl]) return leadingPunct + AREA_LABELS_MR[cl] + trailingPunct;
+        return leadingPunct + transliterateWord(core) + trailingPunct;
     });
     return result.join(' ');
 }
