@@ -165,6 +165,9 @@ function buildServiceFilter() {
     const filterDropdown = document.getElementById('serviceFilter');
     if (!filterDropdown) return;
 
+    // Save current selection so it can be restored after rebuild
+    filterDropdown._prevValue = filterDropdown.value || filterDropdown._prevValue || '';
+
     while (filterDropdown.options.length > 1) filterDropdown.remove(1);
 
     // Count providers per service
@@ -191,6 +194,9 @@ function buildServiceFilter() {
 function buildAreaFilter() {
     const filterDropdown = document.getElementById('areaFilter');
     if (!filterDropdown) return;
+
+    // Save current selection so it can be restored after rebuild
+    filterDropdown._prevValue = filterDropdown.value || filterDropdown._prevValue || '';
 
     while (filterDropdown.options.length > 1) filterDropdown.remove(1);
 
@@ -272,11 +278,14 @@ function buildDynamicAreaChips() {
         return (areaCounts[b] || 0) - (areaCounts[a] || 0);
     });
 
+    // Restore previously selected area (survives language switch)
+    const activeArea = (document.getElementById('areaFilter') || {}).value || '';
+
     sortedAreas.slice(0, 8).forEach(function(area) {
         const count = areaCounts[area] || 0;
         const chip  = document.createElement('button');
         chip.type   = 'button';
-        chip.className = 'area-chip';
+        chip.className = 'area-chip' + (activeArea === area ? ' active' : '');
         chip.setAttribute('data-area', area);
         chip.innerHTML =
             escapeHtml(translateAreaLabel(area)) +
@@ -1057,11 +1066,13 @@ function refreshFilterOptionLabels() {
 
     if (serviceFilter) {
         buildServiceFilter();
+        const prevSvc = serviceFilter._prevValue;
+        if (prevSvc) serviceFilter.value = prevSvc;
     }
     if (areaFilter) {
         buildAreaFilter();
-        const prev = areaFilter._prevValue;
-        if (prev) areaFilter.value = prev;
+        const prevArea = areaFilter._prevValue;
+        if (prevArea) areaFilter.value = prevArea;
     }
 }
 
