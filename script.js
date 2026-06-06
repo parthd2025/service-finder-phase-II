@@ -645,8 +645,12 @@ function updateListingsHeading(resultCount) {
     const active       = !!(searchText || selectedSvc || selectedArea || selectedCategory);
 
     // Sort and heading are only useful when results are visible
-    if (sortWrapper) sortWrapper.style.display = active ? '' : 'none';
-    heading.style.display = active ? '' : 'none';
+    const hasResults = typeof resultCount === 'number' ? resultCount > 0 : true;
+    if (sortWrapper) sortWrapper.style.display = (active && hasResults) ? '' : 'none';
+    heading.style.display  = active ? '' : 'none';
+    // Centre heading when empty state is shown; left-align when results exist
+    heading.style.textAlign = hasResults ? '' : 'center';
+    heading.style.width     = hasResults ? '' : '100%';
 
     if (!active) return;
 
@@ -953,9 +957,9 @@ function updateStatistics(providers) {
         providers.map(function(p) { return p.area; }).filter(Boolean)
     ).size;
 
-    statProviders.textContent = providers.length;
-    statServices.textContent  = serviceCount;
-    statAreas.textContent     = areaCount;
+    statProviders.textContent = toLocalNum(providers.length);
+    statServices.textContent  = toLocalNum(serviceCount);
+    statAreas.textContent     = toLocalNum(areaCount);
 }
 
 // Smooth count-up animation for statistics cards
@@ -964,7 +968,7 @@ function animateValue(element, start, end, duration) {
     const step = function(timestamp) {
         if (!startTimestamp) startTimestamp = timestamp;
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        element.textContent = Math.floor(progress * (end - start) + start);
+        element.textContent = toLocalNum(Math.floor(progress * (end - start) + start));
         if (progress < 1) window.requestAnimationFrame(step);
     };
     window.requestAnimationFrame(step);
