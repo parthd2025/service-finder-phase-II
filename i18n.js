@@ -59,7 +59,28 @@ const TRANSLATIONS = {
         copyright: 'Chhatrapati Sambhajinagar Seva — Chhatrapati Sambhajinagar (Aurangabad). All rights reserved.',
         call: '📞 Call',
         whatsapp: 'WhatsApp',
-        langToggleLabel: 'Language'
+        langToggleLabel: 'Language',
+        clearFilters: 'Clear Filters',
+        statProviders: 'Total Providers',
+        statServices: 'Total Services',
+        statAreas: 'Areas Covered',
+        featuredProviders: 'Featured Providers',
+        addressNotAvailable: 'Address Not Available',
+        catHomeServices: 'Home Services',
+        catConstruction: 'Construction & Improvement',
+        catAutomobile: 'Automobile',
+        catHealth: 'Health & Medical',
+        catProfessional: 'Professional Services',
+        catEvents: 'Events & Hospitality',
+        catRetail: 'Retail & Shops',
+        catOther: 'Other',
+        sortDefault: 'Sort: Default',
+        sortNameAZ: 'Name A → Z',
+        sortNameZA: 'Name Z → A',
+        sortServicesDesc: 'Most Services First',
+        searchFound: 'found',
+        resultsFound: 'providers found',
+        noAreaListed: 'No area listed'
     },
     mr: {
         metaDescription: 'छत्रपती संभाजीनगरमध्ये विश्वासार्ह स्थानिक सेवा — इलेक्ट्रिशियन, प्लंबर, टॅक्सी, दूध वितरण आणि अधिक.',
@@ -119,7 +140,28 @@ const TRANSLATIONS = {
         copyright: 'छत्रपती संभाजीनगर सेवा — छत्रपती संभाजीनगर (औरंगाबाद). सर्व हक्क राखीव.',
         call: '📞 कॉल',
         whatsapp: 'व्हॉट्सअॅप',
-        langToggleLabel: 'भाषा'
+        langToggleLabel: 'भाषा',
+        clearFilters: 'फिल्टर साफ करा',
+        statProviders: 'एकूण प्रदाते',
+        statServices: 'एकूण सेवा',
+        statAreas: 'भाग कव्हर',
+        featuredProviders: 'विशेष प्रदाते',
+        addressNotAvailable: 'पता उपलब्ध नाही',
+        catHomeServices: 'घरगुती सेवा',
+        catConstruction: 'बांधकाम आणि सुधारणा',
+        catAutomobile: 'वाहन सेवा',
+        catHealth: 'आरोग्य आणि वैद्यकीय',
+        catProfessional: 'व्यावसायिक सेवा',
+        catEvents: 'कार्यक्रम आणि आतिथ्य',
+        catRetail: 'किरकोळ आणि दुकाने',
+        catOther: 'इतर',
+        sortDefault: 'क्रम: डिफॉल्ट',
+        sortNameAZ: 'नाव A → Z',
+        sortNameZA: 'नाव Z → A',
+        sortServicesDesc: 'सर्वाधिक सेवा आधी',
+        searchFound: 'सापडले',
+        resultsFound: 'प्रदाते सापडले',
+        noAreaListed: 'भाग नोंदवलेला नाही'
     }
 };
 
@@ -186,6 +228,14 @@ function getStoredLanguage() {
 
 function t(key) {
     return TRANSLATIONS[currentLang][key] || TRANSLATIONS.en[key] || key;
+}
+
+/** Convert an integer to locale-appropriate numeral string.
+ *  In Marathi mode renders Devanagari digits (०१२…), otherwise plain ASCII. */
+function toLocalNum(n) {
+    if (currentLang !== 'mr') return String(n);
+    const DEVA = ['०','१','२','३','४','५','६','७','८','९'];
+    return String(n).replace(/[0-9]/g, function(d) { return DEVA[+d]; });
 }
 
 function setLanguage(lang) {

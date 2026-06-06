@@ -14,9 +14,19 @@
     <div class="page-wrap">
         <header class="site-header" id="home">
             <div class="header-monument" aria-hidden="true">
-                <svg viewBox="0 0 320 140" preserveAspectRatio="xMidYMax meet">
-                    <path fill="currentColor" d="M160 8c-24 0-42 18-42 40v8h-10v84h104V56h-10v-8c0-22-18-40-42-40zm0 16c14 0 26 12 26 26v6h-52v-6c0-14 12-26 26-26zM78 60h18v72H78zm146 0h18v72h-18z"/>
-                    <ellipse cx="160" cy="32" rx="28" ry="16" fill="currentColor"/>
+                <svg viewBox="0 0 800 200" preserveAspectRatio="xMidYMax meet">
+                    <!-- Ellora-inspired caves silhouette left -->
+                    <path d="M80 140L95 110L110 130L125 100L140 125L150 95L160 130Z" fill="#2a0a0a" opacity="0.6"/>
+                    <!-- Grishneshwar Temple center -->
+                    <path d="M380 180L375 140L380 100L385 140Z" fill="#2a0a0a" opacity="0.6"/>
+                    <circle cx="380" cy="95" r="12" fill="#2a0a0a" opacity="0.6"/>
+                    <path d="M375 95L385 95L385 110L375 110Z" fill="#2a0a0a" opacity="0.6"/>
+                    <!-- Daulatabad Fort right -->
+                    <path d="M620 160L610 130L620 100L630 130Z" fill="#2a0a0a" opacity="0.6"/>
+                    <path d="M600 160L640 160L645 180L595 180Z" fill="#2a0a0a" opacity="0.6"/>
+                    <rect x="610" y="140" width="3" height="20" fill="#1a0000" opacity="0.6"/>
+                    <rect x="620" y="140" width="3" height="20" fill="#1a0000" opacity="0.6"/>
+                    <rect x="630" y="140" width="3" height="20" fill="#1a0000" opacity="0.6"/>
                 </svg>
             </div>
 
@@ -57,6 +67,7 @@
                         placeholder="Search for a service or provider..."
                         autocomplete="off"
                     >
+                    <span id="searchCount" class="search-count" aria-live="polite"></span>
                 </div>
                 <select id="serviceFilter" class="search-select" aria-label="Service type">
                     <option value="" data-i18n="allServices">All Services</option>
@@ -103,49 +114,44 @@
             </button>
         </section>
 
-        <section class="popular-section" aria-labelledby="popular-heading">
+
+        <section id="featuredSection" class="featured-section" aria-labelledby="featured-heading" style="display: none;">
             <div class="section-header">
-                <h2 id="popular-heading" class="section-heading">
-                    <span class="heading-star" aria-hidden="true">★</span>
-                    <span data-i18n="popularHeading">Popular Services in Chhatrapati Sambhajinagar</span>
+                <h2 id="featured-heading" class="section-heading">
+                    <span class="heading-star" aria-hidden="true">⭐</span>
+                    <span data-i18n="featuredProviders">Featured Providers</span>
                 </h2>
-                <a href="#allProviders" class="view-all-link" id="viewAllPopular" data-i18n="viewAll">View All</a>
             </div>
-            <div id="popularList" class="popular-scroll" aria-live="polite"></div>
+            <div id="featuredList" class="featured-grid"></div>
         </section>
 
-        <section class="promo-banner" aria-label="About this directory">
-            <div class="promo-art" aria-hidden="true">
-                <svg viewBox="0 0 80 100" fill="none">
-                    <path d="M40 4c-12 0-22 10-22 22v6H8v68h64V32H62v-6c0-12-10-22-22-22zm0 10c6.5 0 12 5.5 12 12v4H28v-4c0-6.5 5.5-12 12-12z" fill="#3d0c0c" opacity="0.35"/>
-                </svg>
-            </div>
-            <p class="promo-text" data-i18n="promoText">Your trusted local service directory in Chhatrapati Sambhajinagar (Aurangabad).</p>
-            <span class="promo-flag" aria-hidden="true">🚩</span>
-        </section>
 
         <section class="area-chips-section" aria-label="Browse by area">
             <p class="area-chips-label" data-i18n="browseByArea">Browse by area</p>
             <div class="area-chips" role="group">
-                <button type="button" class="area-chip" data-area="CIDCO">CIDCO</button>
-                <button type="button" class="area-chip" data-area="Garkheda">Garkheda</button>
-                <button type="button" class="area-chip" data-area="Mukundwadi">Mukundwadi</button>
-                <button type="button" class="area-chip" data-area="Satara">Satara</button>
-                <button type="button" class="area-chip" data-area="Osmanpura">Osmanpura</button>
-                <button type="button" class="area-chip" data-area="Jalna Road">Jalna Road</button>
-                <button type="button" class="area-chip" data-area="Beed Bypass">Beed Bypass</button>
-                <button type="button" class="area-chip" data-area="Shahnoorwadi">Shahnoorwadi</button>
+                <!-- Populated dynamically from API data by buildDynamicAreaChips() -->
             </div>
         </section>
 
         <main class="listings-section" id="allProviders">
             <div class="listings-header">
                 <h2 class="section-heading" data-i18n="allProviders">All Service Providers</h2>
-                <div class="status-filter-wrap">
-                    <label for="statusFilter" class="visually-hidden">Status</label>
-                    <select id="statusFilter" class="status-select">
-                        <option value="" data-i18n="allStatus">All Status</option>
-                    </select>
+                <div class="listings-controls">
+                    <div class="status-filter-wrap">
+                        <label for="statusFilter" class="visually-hidden">Status</label>
+                        <select id="statusFilter" class="status-select">
+                            <option value="" data-i18n="allStatus">All Status</option>
+                        </select>
+                    </div>
+                    <div class="status-filter-wrap">
+                        <label for="sortFilter" class="visually-hidden">Sort</label>
+                        <select id="sortFilter" class="status-select">
+                            <option value="default" data-i18n="sortDefault">Sort: Default</option>
+                            <option value="name_az" data-i18n="sortNameAZ">Name A → Z</option>
+                            <option value="name_za" data-i18n="sortNameZA">Name Z → A</option>
+                            <option value="services_desc" data-i18n="sortServicesDesc">Most Services First</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -178,8 +184,15 @@
 
     <footer class="site-footer" id="contact">
         <div class="footer-monument" aria-hidden="true">
-            <svg viewBox="0 0 400 70" preserveAspectRatio="xMidYMax meet">
-                <path fill="currentColor" d="M200 4c-26 0-46 20-46 44v6h-12v16h116V54h-12v-6c0-24-20-44-46-44zm0 16c16 0 28 12 28 28v4H172v-4c0-16 12-28 28-28z"/>
+            <svg viewBox="0 0 800 120" preserveAspectRatio="xMidYMax meet">
+                <!-- Ellora Caves inspired rocks left side -->
+                <path d="M50 80L65 50L80 70L95 40L110 65L120 30L135 70Z" fill="#ffffff" opacity="0.05"/>
+                <!-- Daulatabad Fort inspired structure center -->
+                <path d="M350 100L340 70L350 40L360 70Z" fill="#ffffff" opacity="0.05"/>
+                <path d="M330 100L370 100L375 110L325 110Z" fill="#ffffff" opacity="0.05"/>
+                <!-- General heritage silhouette right -->
+                <path d="M600 95L590 65L600 35L610 65Z" fill="#ffffff" opacity="0.05"/>
+                <path d="M700 95L710 65L720 80L730 60L740 85L750 55L760 80Z" fill="#ffffff" opacity="0.05"/>
             </svg>
         </div>
         <div class="footer-inner">
