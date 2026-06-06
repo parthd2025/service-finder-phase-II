@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initFooterServiceLinks();
     initSearchButton();
+    initComingSoonButtons();
     initViewAllLinks();
     initClearFiltersButton();
 
@@ -1209,4 +1210,34 @@ function addEventListeners() {
 
     const sortFilter = document.getElementById('sortFilter');
     if (sortFilter) sortFilter.addEventListener('change', applyAllFilters);
+}
+
+// ── Coming-soon toast for social icons & email ────────────────────────────────
+function initComingSoonButtons() {
+    const toast = document.getElementById('comingSoonToast');
+    if (!toast) return;
+
+    let hideTimer = null;
+
+    function showToast() {
+        const msg = currentLang === 'mr' ? '🚀 लवकरच येत आहे!' : '🚀 Coming Soon!';
+        toast.textContent = msg;
+        toast.hidden = false;
+        // Force reflow so transition fires
+        toast.getBoundingClientRect();
+        toast.classList.add('visible');
+
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(function() {
+            toast.classList.remove('visible');
+            setTimeout(function() { toast.hidden = true; }, 260);
+        }, 2500);
+    }
+
+    document.querySelectorAll('[data-coming-soon]').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            showToast();
+        });
+    });
 }
