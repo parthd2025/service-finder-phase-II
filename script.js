@@ -149,7 +149,6 @@ function getServiceEmoji(serviceName) {
 function buildFilterOptions() {
     buildServiceFilter();
     buildAreaFilter();
-    buildStatusFilter();
 }
 
 function buildServiceFilter() {
@@ -396,40 +395,8 @@ function buildStatistics() {
 }
 
 function buildFeaturedSection() {
-    const featuredProviders = allProviders.filter(function(p) {
-        return p.featured && (p.featured.toLowerCase() === 'yes' || p.featured === true);
-    });
-
-    let featuredSection = document.getElementById('featuredSection');
-
-    if (featuredProviders.length === 0) {
-        if (featuredSection) featuredSection.style.display = 'none';
-        return;
-    }
-
-    if (!featuredSection) {
-        featuredSection = document.createElement('section');
-        featuredSection.id = 'featuredSection';
-        featuredSection.className = 'featured-section';
-        featuredSection.setAttribute('aria-labelledby', 'featured-heading');
-        const popularSection = document.querySelector('.popular-section');
-        if (popularSection) popularSection.insertAdjacentElement('afterend', featuredSection);
-    }
-
-    featuredSection.style.display = 'block';
-    featuredSection.innerHTML =
-        '<div class="section-header">' +
-            '<h2 id="featured-heading" class="section-heading">' +
-                '<span class="heading-star" aria-hidden="true">⭐</span>' +
-                '<span data-i18n="featuredProviders">' + escapeHtml(t('featuredProviders')) + '</span>' +
-            '</h2>' +
-        '</div>' +
-        '<div id="featuredList" class="featured-grid"></div>';
-
-    const featuredList = featuredSection.querySelector('#featuredList');
-    featuredProviders.forEach(function(provider) {
-        featuredList.appendChild(createProviderCard(provider, true));
-    });
+    const featuredSection = document.getElementById('featuredSection');
+    if (featuredSection) featuredSection.style.display = 'none';
 }
 
 // ==== PROVIDER CARD CREATION ====
@@ -502,9 +469,6 @@ function applyAllFilters() {
     const searchText     = document.getElementById('searchBox').value.toLowerCase();
     const selectedService = document.getElementById('serviceFilter').value;
     const selectedArea    = document.getElementById('areaFilter').value;
-    const statusFilter    = document.getElementById('statusFilter');
-    const selectedStatus  = statusFilter ? statusFilter.value : '';
-
     const sortFilter = document.getElementById('sortFilter');
     const selectedSort = sortFilter ? sortFilter.value : 'default';
 
@@ -521,9 +485,7 @@ function applyAllFilters() {
 
         const matchesArea   = !selectedArea
             || (selectedArea === '__noArea' ? !(provider.area || '').trim() : provider.area === selectedArea);
-        const matchesStatus = !selectedStatus || provider.status === selectedStatus;
-
-        return matchesSearch && matchesServiceType && matchesCategory && matchesArea && matchesStatus;
+        return matchesSearch && matchesServiceType && matchesCategory && matchesArea;
     });
 
     // Sort the filtered results
@@ -532,10 +494,10 @@ function applyAllFilters() {
         sortedProviders.sort(function(a, b) { return (a.name || '').localeCompare(b.name || ''); });
     } else if (selectedSort === 'name_za') {
         sortedProviders.sort(function(a, b) { return (b.name || '').localeCompare(a.name || ''); });
-    } else if (selectedSort === 'services_desc') {
-        sortedProviders.sort(function(a, b) {
-            return (b.services || []).length - (a.services || []).length;
-        });
+    } else if (selectedSort === 'newest') {
+        sortedProviders.sort(function(a, b) { return (parseInt(b.provider_id) || 0) - (parseInt(a.provider_id) || 0); });
+    } else if (selectedSort === 'oldest') {
+        sortedProviders.sort(function(a, b) { return (parseInt(a.provider_id) || 0) - (parseInt(b.provider_id) || 0); });
     }
 
     // Update live count inside the search box
@@ -546,7 +508,7 @@ function applyAllFilters() {
             document.getElementById('serviceFilter').value ||
             document.getElementById('areaFilter').value ||
             selectedCategory ||
-            (document.getElementById('statusFilter') && document.getElementById('statusFilter').value);
+            false;
 
         if (hasAnyFilter) {
             searchCountEl.textContent = toLocalNum(filteredProviders.length) + ' ' + t('searchFound');
@@ -556,8 +518,76 @@ function applyAllFilters() {
         }
     }
 
+    // If no filter is active at all, show the prompt instead of all providers
+    if (!hasActiveFilter()) {
+        showBrowsePrompt();
+        updateStatistics(allProviders);
+        return;
+    }
+
     displayProviders(sortedProviders);
     updateStatistics(filteredProviders);
+}
+
+function hasActiveFilter() {
+    const searchText  = (document.getElementById('searchBox').value || '').trim();
+    const selectedSvc = document.getElementById('serviceFilter').value;
+    const selectedArea = document.getElementById('areaFilter').value;
+    // Status filter is excluded — "Active" is a system default, not a user intent signal
+    return !!(searchText || selectedSvc || selectedArea || selectedCategory);
+}
+
+const POPULAR_QUICK = [
+    { emoji: '⚡', key: 'Electrician' },
+    { emoji: '🔧', key: 'Plumber' },
+    { emoji: '🪚', key: 'Carpenter' },
+    { emoji: '❄️', key: 'AC Repair' },
+    { emoji: '🚕', key: 'Taxi Service' },
+    { emoji: '🥛', key: 'Milk Delivery' },
+    { emoji: '🏗️', key: 'Construction' },
+    { emoji: '🎨', key: 'Painter' },
+];
+
+function showBrowsePrompt() {
+    const servicesList = document.getElementById('servicesList');
+    if (!servicesList) return;
+    const heading = document.getElementById('listingsHeading');
+    if (heading) heading.textContent = t('allProviders');
+
+    // Build popular chips from services that actually exist in the data
+    const existingServices = new Set(allServices.map(function(s) { return s.toLowerCase(); }));
+    const chips = POPULAR_QUICK
+        .filter(function(q) { return existingServices.has(q.key.toLowerCase()); })
+        .map(function(q) {
+            return '<button type="button" class="popular-quick-chip" data-quick-service="' +
+                escapeHtml(q.key) + '">' +
+                q.emoji + ' ' + escapeHtml(translateServiceLabel(q.key)) +
+                '</button>';
+        }).join('');
+
+    servicesList.innerHTML =
+        '<div class="browse-prompt">' +
+            '<div class="browse-prompt-icon">🔎</div>' +
+            '<p class="browse-prompt-title">' + escapeHtml(t('browsePromptTitle')) + '</p>' +
+            '<p class="browse-prompt-sub">' + escapeHtml(t('browsePromptSub')) + '</p>' +
+            (chips ? '<div class="popular-quick-chips">' + chips + '</div>' : '') +
+        '</div>';
+
+    // Wire chip clicks
+    servicesList.querySelectorAll('.popular-quick-chip').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const svcName = this.getAttribute('data-quick-service');
+            const svcFilter = document.getElementById('serviceFilter');
+            if (svcFilter) {
+                svcFilter.value = svcName;
+                if (customServiceSelect) customServiceSelect.refresh();
+                // Sync trigger label
+                if (customServiceSelect) customServiceSelect._renderTrigger();
+            }
+            applyAllFilters();
+            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
 }
 
 // Multi-field, multi-word search.
@@ -584,9 +614,36 @@ function matchesAdvancedSearch(provider, searchText) {
     });
 }
 
+function updateListingsHeading() {
+    const heading = document.getElementById('listingsHeading');
+    if (!heading) return;
+
+    const searchText    = (document.getElementById('searchBox').value || '').trim();
+    const selectedSvc   = document.getElementById('serviceFilter').value;
+    const selectedArea  = document.getElementById('areaFilter').value;
+
+    if (searchText) {
+        heading.textContent = '🔍 "' + searchText + '"';
+    } else if (selectedCategory) {
+        const label = translateCategoryLabel(selectedCategory);
+        heading.textContent = label;
+    } else if (selectedSvc) {
+        heading.textContent = translateServiceLabel(selectedSvc);
+    } else if (selectedArea) {
+        if (selectedArea === '__noArea') {
+            heading.textContent = t('noAreaListed');
+        } else {
+            heading.textContent = '🏘️ ' + translateAreaLabel(selectedArea);
+        }
+    } else {
+        heading.textContent = t('allProviders');
+    }
+}
+
 function displayProviders(providers) {
     const servicesList = document.getElementById('servicesList');
     servicesList.innerHTML = '';
+    updateListingsHeading();
 
     if (providers.length === 0) {
         servicesList.innerHTML =
@@ -951,13 +1008,6 @@ function clearAllFilters() {
     if (customAreaSelect) customAreaSelect.reset();
     else document.getElementById('areaFilter').value = '';
 
-    const statusFilter = document.getElementById('statusFilter');
-    if (statusFilter) {
-        statusFilter.value = [...statusFilter.options].some(function(opt) { return opt.value === 'Active'; })
-            ? 'Active'
-            : '';
-    }
-
     document.querySelectorAll('.category-tile').forEach(function(t) { t.classList.remove('active'); });
     document.querySelectorAll('.area-chip').forEach(function(c) { c.classList.remove('active'); });
 
@@ -974,37 +1024,26 @@ function initClearFiltersButton() {
 function updateSelectDefaults() {
     const serviceFilter = document.getElementById('serviceFilter');
     const areaFilter    = document.getElementById('areaFilter');
-    const statusFilter  = document.getElementById('statusFilter');
-    const serviceCount = allServices.length;
-    const areaCount    = allAreas.length;
+    const serviceCount  = allServices.length;
+    const areaCount     = allAreas.length;
 
     if (serviceFilter && serviceFilter.options[0])
         serviceFilter.options[0].textContent = t('allServices') + (serviceCount > 0 ? ' (' + toLocalNum(serviceCount) + ')' : '');
     if (areaFilter && areaFilter.options[0])
         areaFilter.options[0].textContent    = t('allAreas')    + (areaCount    > 0 ? ' (' + toLocalNum(areaCount)    + ')' : '');
-    if (statusFilter  && statusFilter.options[0])  statusFilter.options[0].textContent  = t('allStatus');
 }
 
 function refreshFilterOptionLabels() {
     const serviceFilter = document.getElementById('serviceFilter');
     const areaFilter    = document.getElementById('areaFilter');
-    const statusFilter  = document.getElementById('statusFilter');
 
     if (serviceFilter) {
-        buildServiceFilter(); // rebuilds native options + calls customServiceSelect.refresh()
+        buildServiceFilter();
     }
     if (areaFilter) {
-        // Rebuild fully so counts and translations stay in sync
         buildAreaFilter();
-        // Restore previously selected value
         const prev = areaFilter._prevValue;
         if (prev) areaFilter.value = prev;
-    }
-    if (statusFilter) {
-        for (let i = 1; i < statusFilter.options.length; i++) {
-            const opt = statusFilter.options[i];
-            opt.textContent = translateStatusLabel(opt.value);
-        }
     }
 }
 
@@ -1156,9 +1195,6 @@ function addEventListeners() {
     });
 
     document.getElementById('areaFilter').addEventListener('change', applyAllFilters);
-
-    const statusFilter = document.getElementById('statusFilter');
-    if (statusFilter) statusFilter.addEventListener('change', applyAllFilters);
 
     const sortFilter = document.getElementById('sortFilter');
     if (sortFilter) sortFilter.addEventListener('change', applyAllFilters);

@@ -77,10 +77,13 @@ const TRANSLATIONS = {
         sortDefault: 'Sort: Default',
         sortNameAZ: 'Name A → Z',
         sortNameZA: 'Name Z → A',
-        sortServicesDesc: 'Most Services First',
+        sortNewest: 'Recently Added',
+        sortOldest: 'Oldest First',
         searchFound: 'found',
         resultsFound: 'providers found',
-        noAreaListed: 'No area listed'
+        noAreaListed: 'No area listed',
+        browsePromptTitle: 'Search or browse to find providers',
+        browsePromptSub: 'Use the search bar above, or pick a category, area, or service to get started.'
     },
     mr: {
         metaDescription: 'छत्रपती संभाजीनगरमध्ये विश्वासार्ह स्थानिक सेवा — इलेक्ट्रिशियन, प्लंबर, टॅक्सी, दूध वितरण आणि अधिक.',
@@ -158,10 +161,13 @@ const TRANSLATIONS = {
         sortDefault: 'क्रम: डिफॉल्ट',
         sortNameAZ: 'नाव A → Z',
         sortNameZA: 'नाव Z → A',
-        sortServicesDesc: 'सर्वाधिक सेवा आधी',
+        sortNewest: 'नवीन आधी',
+        sortOldest: 'जुने आधी',
         searchFound: 'सापडले',
         resultsFound: 'प्रदाते सापडले',
-        noAreaListed: 'भाग नोंदवलेला नाही'
+        noAreaListed: 'भाग नोंदवलेला नाही',
+        browsePromptTitle: 'सेवा शोधण्यासाठी शोधा किंवा निवडा',
+        browsePromptSub: 'वरील शोध बार वापरा, किंवा श्रेणी, भाग किंवा सेवा निवडा.'
     }
 };
 

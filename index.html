@@ -135,21 +135,16 @@
 
         <main class="listings-section" id="allProviders">
             <div class="listings-header">
-                <h2 class="section-heading" data-i18n="allProviders">All Service Providers</h2>
+                <h2 id="listingsHeading" class="section-heading" data-i18n="allProviders">All Service Providers</h2>
                 <div class="listings-controls">
-                    <div class="status-filter-wrap">
-                        <label for="statusFilter" class="visually-hidden">Status</label>
-                        <select id="statusFilter" class="status-select">
-                            <option value="" data-i18n="allStatus">All Status</option>
-                        </select>
-                    </div>
                     <div class="status-filter-wrap">
                         <label for="sortFilter" class="visually-hidden">Sort</label>
                         <select id="sortFilter" class="status-select">
                             <option value="default" data-i18n="sortDefault">Sort: Default</option>
                             <option value="name_az" data-i18n="sortNameAZ">Name A → Z</option>
                             <option value="name_za" data-i18n="sortNameZA">Name Z → A</option>
-                            <option value="services_desc" data-i18n="sortServicesDesc">Most Services First</option>
+                            <option value="newest" data-i18n="sortNewest">Recently Added</option>
+                            <option value="oldest" data-i18n="sortOldest">Oldest First</option>
                         </select>
                     </div>
                 </div>
