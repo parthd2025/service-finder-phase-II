@@ -448,7 +448,7 @@ function createProviderCard(provider, isFeatured) {
             '</div>';
     } else {
         // Fallback: no services mapped yet
-        servicesHtml = '<p class="card-service service-default">' + escapeHtml(t('noResults')) + '</p>';
+        servicesHtml = '<p class="card-service service-default">' + escapeHtml(t('serviceNotListed')) + '</p>';
     }
 
     card.innerHTML =
