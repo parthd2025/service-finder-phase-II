@@ -562,8 +562,7 @@ const POPULAR_QUICK = [
 function showBrowsePrompt() {
     const servicesList = document.getElementById('servicesList');
     if (!servicesList) return;
-    const heading = document.getElementById('listingsHeading');
-    if (heading) heading.textContent = t('allProviders');
+    updateListingsHeading(); // no filter active → sets browse title + hides sort
 
     // Build popular chips from services that actually exist in the data
     const existingServices = new Set(allServices.map(function(s) { return s.toLowerCase(); }));
@@ -626,36 +625,52 @@ function matchesAdvancedSearch(provider, searchText) {
     });
 }
 
-function updateListingsHeading() {
-    const heading = document.getElementById('listingsHeading');
+function updateListingsHeading(resultCount) {
+    const heading     = document.getElementById('listingsHeading');
+    const sortWrapper = document.querySelector('.status-filter-wrap');
     if (!heading) return;
 
-    const searchText    = (document.getElementById('searchBox').value || '').trim();
-    const selectedSvc   = document.getElementById('serviceFilter').value;
-    const selectedArea  = document.getElementById('areaFilter').value;
+    const searchText   = (document.getElementById('searchBox').value || '').trim();
+    const selectedSvc  = document.getElementById('serviceFilter').value;
+    const selectedArea = document.getElementById('areaFilter').value;
+    const active       = !!(searchText || selectedSvc || selectedArea || selectedCategory);
 
+    // Sort is only useful when results are visible
+    if (sortWrapper) sortWrapper.style.display = active ? '' : 'none';
+
+    if (!active) {
+        // Nothing selected — show a neutral browse title, no count
+        heading.textContent = t('browseServicesTitle');
+        return;
+    }
+
+    // Build a context label
+    let label = '';
     if (searchText) {
-        heading.textContent = '🔍 "' + searchText + '"';
+        label = '🔍 "' + searchText + '"';
     } else if (selectedCategory) {
-        const label = translateCategoryLabel(selectedCategory);
-        heading.textContent = label;
+        label = translateCategoryLabel(selectedCategory);
     } else if (selectedSvc) {
-        heading.textContent = translateServiceLabel(selectedSvc);
+        label = translateServiceLabel(selectedSvc);
     } else if (selectedArea) {
-        if (selectedArea === '__noArea') {
-            heading.textContent = t('noAreaListed');
-        } else {
-            heading.textContent = '🏘️ ' + translateAreaLabel(selectedArea);
-        }
+        label = selectedArea === '__noArea'
+            ? t('noAreaListed')
+            : '🏘️ ' + translateAreaLabel(selectedArea);
+    }
+
+    // Append count if we have one
+    if (typeof resultCount === 'number') {
+        const countStr = toLocalNum(resultCount) + ' ' + t('resultsFound');
+        heading.textContent = label ? label + '  —  ' + countStr : countStr;
     } else {
-        heading.textContent = t('allProviders');
+        heading.textContent = label || t('allProviders');
     }
 }
 
 function displayProviders(providers) {
     const servicesList = document.getElementById('servicesList');
     servicesList.innerHTML = '';
-    updateListingsHeading();
+    updateListingsHeading(providers.length);
 
     if (providers.length === 0) {
         servicesList.innerHTML =
@@ -668,12 +683,6 @@ function displayProviders(providers) {
             '</div>';
         return;
     }
-
-    // Results count banner
-    const countBanner = document.createElement('div');
-    countBanner.className = 'results-count';
-    countBanner.textContent = toLocalNum(providers.length) + ' ' + t('resultsFound');
-    servicesList.appendChild(countBanner);
 
     providers.forEach(function(provider) {
         servicesList.appendChild(createProviderCard(provider));
