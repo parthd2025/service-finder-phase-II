@@ -635,14 +635,11 @@ function updateListingsHeading(resultCount) {
     const selectedArea = document.getElementById('areaFilter').value;
     const active       = !!(searchText || selectedSvc || selectedArea || selectedCategory);
 
-    // Sort is only useful when results are visible
+    // Sort and heading are only useful when results are visible
     if (sortWrapper) sortWrapper.style.display = active ? '' : 'none';
+    heading.style.display = active ? '' : 'none';
 
-    if (!active) {
-        // Nothing selected — show a neutral browse title, no count
-        heading.textContent = t('browseServicesTitle');
-        return;
-    }
+    if (!active) return;
 
     // Build a context label
     let label = '';
