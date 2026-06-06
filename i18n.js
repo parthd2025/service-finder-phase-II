@@ -142,7 +142,7 @@ const TRANSLATIONS = {
         madeWithLove: 'छत्रपती संभाजीनगरमध्ये ❤️ सह बनवले',
         copyright: 'छत्रपती संभाजीनगर सेवा — छत्रपती संभाजीनगर (औरंगाबाद). सर्व हक्क राखीव.',
         call: '📞 कॉल',
-        whatsapp: 'व्हॉट्सअॅप',
+        whatsapp: 'व्हॉट्सॲप',
         langToggleLabel: 'भाषा',
         clearFilters: 'फिल्टर साफ करा',
         statProviders: 'एकूण प्रदाते',
@@ -171,27 +171,51 @@ const TRANSLATIONS = {
     }
 };
 
-/** Area names → Marathi (exact + partial keys) */
+/** Area names → Marathi (exact full-name keys take priority; single-word keys used for word-by-word fallback) */
 const AREA_LABELS_MR = {
+    // Full compound area names (checked first as exact matches)
+    'n4 cidco': 'N4 सिडको',
+    'n1 cidco': 'N1 सिडको',
+    'n2 cidco': 'N2 सिडको',
+    'n 2': 'N 2',
+    'n 1': 'N 1',
+    'chetak ghoda': 'चेतक घोडा',
+    'sindhi colony': 'सिंधी कॉलनी',
+    'jalna road': 'जालना रोड',
+    'beed bypass': 'बीड बायपास',
+    'chhatrapati sambhajinagar': 'छत्रपती संभाजीनगर',
+
+    // Single-word keys — used word-by-word when full name has no exact match
     cidco: 'सिडको',
     garkheda: 'गरखेडा',
     mukundwadi: 'मुकुंदवाडी',
     satara: 'सातारा',
     osmanpura: 'उस्मानपुरा',
-    'jalna road': 'जालना रोड',
-    'beed bypass': 'बीड बायपास',
     shahnoorwadi: 'शहनूरवाडी',
     aurangabad: 'औरंगाबाद',
+    aurangpura: 'औरंगपुरा',
     whitefield: 'व्हाइटफील्ड',
-    'chhatrapati sambhajinagar': 'छत्रपती संभाजीनगर',
     sambhajinagar: 'संभाजीनगर',
     cantonment: 'छावणी',
+    chikalthana: 'चिकलठाणा',
+    ulkanagari: 'उल्कानगरी',
     nashik: 'नाशिक',
     pune: 'पुणे',
     mumbai: 'मुंबई',
+    sindhi: 'सिंधी',
+    chetak: 'चेतक',
+    ghoda: 'घोडा',
+    gajanan: 'गजानन',
+    buddha: 'बुद्ध',
+    arihant: 'अरिहंत',
+    uttam: 'उत्तम',
+    vishnu: 'विष्णू',
+    mondha: 'मोंढा',
     nagar: 'नगर',
     road: 'रोड',
-    colony: 'कॉलनी'
+    colony: 'कॉलनी',
+    chowk: 'चौक',
+    pura: 'पुरा'
 };
 
 const CONSONANT_MR = {
@@ -205,24 +229,120 @@ const VOWEL_MATRA_MR = {
     a: '', aa: 'ा', i: 'ि', ee: 'ी', ii: 'ी', u: 'ु', oo: 'ू', uu: 'ू', e: 'े', ai: 'ै', o: 'ो', au: 'ौ'
 };
 
-/** Common service names from sheet → Marathi display */
+/** Standalone vowel characters — used when a vowel appears at the start of a word or after another vowel */
+const VOWEL_STANDALONE_MR = {
+    aa: 'आ', a: 'अ', i: 'इ', ee: 'ई', ii: 'ई', u: 'उ', oo: 'ऊ', uu: 'ऊ',
+    e: 'ए', ai: 'ऐ', o: 'ओ', au: 'औ'
+};
+
+/** Common Indian first names and Marathi surnames → Devanagari.
+ *  Used word-by-word in translateProviderName so business names like
+ *  "Krushna Furniture" also benefit (Furniture falls through to SERVICE_LABELS_MR). */
+const PROVIDER_NAME_PARTS_MR = {
+    // First names
+    ramesh: 'रमेश', suresh: 'सुरेश', mahesh: 'महेश', rajesh: 'राजेश',
+    dinesh: 'दिनेश', ganesh: 'गणेश', naresh: 'नरेश',
+    vithal: 'विठल', vitthal: 'विठ्ठल',
+    amol: 'अमोल', anil: 'अनिल', ajay: 'अजय', atul: 'अतुल',
+    santosh: 'संतोष', sanjay: 'संजय', suraj: 'सूरज', satish: 'सतीश',
+    kartik: 'कार्तिक', karthik: 'कार्तिक',
+    krushna: 'कृष्णा', krishna: 'कृष्ण',
+    vijay: 'विजय', vinay: 'विनय', vishal: 'विशाल', vikram: 'विक्रम',
+    rahul: 'राहुल', ravi: 'रवी', rakesh: 'राकेश', rajendra: 'राजेंद्र',
+    pravin: 'प्रवीण', prashant: 'प्रशांत', prasad: 'प्रसाद', pankaj: 'पंकज',
+    nilesh: 'नीलेश', nitin: 'नितीन',
+    manoj: 'मनोज', mohan: 'मोहन', mangesh: 'मंगेश', milind: 'मिलिंद',
+    sunil: 'सुनील', sharad: 'शरद', shivaji: 'शिवाजी',
+    ashok: 'अशोक', arjun: 'अर्जुन', amit: 'अमित', abhijit: 'अभिजित',
+    deepak: 'दीपक', devendra: 'देवेंद्र', datta: 'दत्ता',
+    gopal: 'गोपाळ', girish: 'गिरीश', gajanan: 'गजानन',
+    hemant: 'हेमंत', harish: 'हरीश',
+    jagdish: 'जगदीश', jitendra: 'जितेंद्र',
+    kiran: 'किरण', kishor: 'किशोर',
+    laxman: 'लक्ष्मण', lokesh: 'लोकेश',
+    mukesh: 'मुकेश', mukund: 'मुकुंद',
+    om: 'ओम',
+    parasram: 'परसराम', parshuram: 'परशुराम', prabhakar: 'प्रभाकर',
+    rohit: 'रोहित', rohan: 'रोहन',
+    sachin: 'सचिन', sagar: 'सागर', sandip: 'संदीप', sandeep: 'संदीप',
+    tushar: 'तुषार', umesh: 'उमेश',
+    vaibhav: 'वैभव', vilas: 'विलास',
+    yogesh: 'योगेश', yuvraj: 'युवराज',
+    ajit: 'अजित', ashish: 'आशिष', akash: 'आकाश', aniket: 'अनिकेत',
+
+    // Common Marathi / Marathi surnames
+    shinde: 'शिंदे', shirke: 'शिर्के', salunkhe: 'साळुंखे',
+    patil: 'पाटील', pawar: 'पवार',
+    deshmukh: 'देशमुख', dabhade: 'दाभाडे', dalvi: 'दळवी', dolkathi: 'दोळकथी',
+    jadhav: 'जाधव', joshi: 'जोशी',
+    kathar: 'कथर', kadam: 'कदम', kulkarni: 'कुलकर्णी', kamble: 'कांबळे',
+    more: 'मोरे', mane: 'माने', mohite: 'मोहिते',
+    naik: 'नाईक', nikam: 'निकम',
+    rathod: 'राठोड', rane: 'राणे',
+    sawant: 'सावंत', salve: 'साळवे',
+    thorat: 'थोरात',
+    wankhede: 'वानखेडे', waghmare: 'वाघमारे',
+    barkale: 'बरकले',
+    chaudhari: 'चौधरी', chavan: 'चव्हाण',
+    gaikwad: 'गायकवाड',
+    bhosale: 'भोसले', bhosle: 'भोसले',
+    kale: 'काळे', kolhe: 'कोळहे',
+};
+
+/** Common service names from sheet → Marathi display.
+ *  Longer / more-specific entries must come before shorter ones
+ *  so the word-boundary matcher finds the best match first. */
 const SERVICE_LABELS_MR = {
+    // Electrical
     electrician: 'इलेक्ट्रिशियन',
     electric: 'इलेक्ट्रिक',
+    electrical: 'इलेक्ट्रिकल',
+
+    // Plumbing
     plumber: 'प्लंबर',
     plumbing: 'प्लंबिंग',
+
+    // Carpentry / Furniture
     carpenter: 'सुतार',
     carpentry: 'सुतारकाम',
+    furniture: 'फर्निचर',
+
+    // Tiles & Construction
+    'tile contractor': 'टाइल कंत्राटदार',
+    'tile work': 'टाइल काम',
+    tile: 'टाइल',
+    contractor: 'कंत्राटदार',
+    fabrication: 'फॅब्रिकेशन',
+    mason: 'गवंडी',
+    masonry: 'गवंडीकाम',
+    welding: 'वेल्डिंग',
+    construction: 'बांधकाम',
+    civil: 'सिव्हिल',
+
+    // Transport
     taxi: 'टॅक्सी',
     cab: 'टॅक्सी',
     auto: 'ऑटो',
     rickshaw: 'रिक्षा',
+    transport: 'वाहतूक',
+
+    // Home services
     milk: 'दूध',
+    painter: 'पेंटर',
+    painting: 'पेंटिंग',
+    cleaning: 'साफसफाई',
+    'pest control': 'कीटक नियंत्रण',
+    pest: 'कीटक नियंत्रण',
+    gardening: 'बागकाम',
+    security: 'सुरक्षा',
+    catering: 'केटरिंग',
+
+    // AC / Appliances
+    'ac service': 'एसी सेवा',
     'ac repair': 'एसी दुरुस्ती',
     ac: 'एसी',
-    painter: 'पेंटर',
-    cleaning: 'साफसफाई',
-    pest: 'कीटक नियंत्रण'
+    repair: 'दुरुस्ती',
+    service: 'सेवा'
 };
 
 let currentLang = 'en';
@@ -307,7 +427,18 @@ function transliterateWord(word) {
         }
 
         if (!consonant) {
-            i += 1;
+            // No consonant found — treat as a standalone vowel (e.g. word-initial 'a', 'e', 'i')
+            let found = false;
+            for (const len of [2, 1]) {
+                const v = s.substring(i, i + len);
+                if (VOWEL_STANDALONE_MR[v]) {
+                    out += VOWEL_STANDALONE_MR[v];
+                    i += len;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) i += 1;
             continue;
         }
 
@@ -340,25 +471,43 @@ function translateAreaLabel(area) {
     if (currentLang === 'en' || !area) return area;
 
     const lower = area.toLowerCase().trim();
+    // Exact match for the full area string
     if (AREA_LABELS_MR[lower]) return AREA_LABELS_MR[lower];
 
-    for (const [key, label] of Object.entries(AREA_LABELS_MR)) {
-        if (lower.includes(key)) return label;
-    }
-
-    return transliterateLatin(area);
+    // Word-by-word: translate known words, transliterate the rest.
+    // Words containing digits (e.g. "N4") or single characters (e.g. "N") are kept as-is.
+    const words = area.trim().split(/\s+/);
+    const result = words.map(function(word) {
+        if (/\d/.test(word) || word.length === 1) return word;
+        const wl = word.toLowerCase();
+        if (AREA_LABELS_MR[wl]) return AREA_LABELS_MR[wl];
+        return transliterateWord(word);
+    });
+    return result.join(' ');
 }
 
 function translateProviderName(name) {
     if (currentLang === 'en' || !name) return name;
-    return transliterateLatin(name);
+    return name.trim().split(/\s+/).map(function(word) {
+        const wl = word.toLowerCase();
+        // 1. Known name/surname dictionary
+        if (PROVIDER_NAME_PARTS_MR[wl]) return PROVIDER_NAME_PARTS_MR[wl];
+        // 2. Service word in a business name (e.g. "Furniture", "Plumber")
+        if (SERVICE_LABELS_MR[wl]) return SERVICE_LABELS_MR[wl];
+        // 3. Fallback: phonetic transliteration
+        return transliterateWord(word);
+    }).join(' ');
 }
 
 function translateServiceLabel(service) {
     if (currentLang === 'en' || !service) return service;
-    const lower = service.toLowerCase();
+    const lower = service.toLowerCase().trim();
+    // Exact match first
+    if (SERVICE_LABELS_MR[lower]) return SERVICE_LABELS_MR[lower];
+    // Word-boundary match: avoids false hits like "contractor" matching "ac"
     for (const [keyword, label] of Object.entries(SERVICE_LABELS_MR)) {
-        if (lower.includes(keyword)) return label;
+        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        if (new RegExp('\\b' + escaped + '\\b').test(lower)) return label;
     }
     return transliterateLatin(service);
 }

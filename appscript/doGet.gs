@@ -239,9 +239,12 @@ function buildProviders(ss, normalizationMap) {
       }
     });
 
+    var nameMr = val(row, "name_mr"); // Marathi name from transliterateMr.gs
+
     providers.push({
       provider_id: providerId,
       name:        name,
+      name_mr:     nameMr,
       phone:       val(row, "mobile_1"),
       phone2:      val(row, "mobile_2"),
       address:     val(row, "address"),

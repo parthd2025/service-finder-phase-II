@@ -25,7 +25,7 @@ let serviceEmojis  = {};  // service name → emoji (built from API data)
 let selectedCategory = ''; // Active category tile filter
 
 // ⚠️  UPDATE THIS URL after redeploying doGet.gs as a new web app deployment.
-const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIO9e8xf3cGlQiZzmlx8pAL0wLB7XRQWR4JtUBCFfvMvrXaLlStrhF0CpTcCTzuJtY/exec';
+const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZxsjlBZtmfyDolPnCCAp-QJJSe5a15PIKWC9V0x4-dhrZvwnuszEKdTGxxRa4833s/exec';
 
 // ==== INITIALIZATION ====
 document.addEventListener('DOMContentLoaded', function() {
@@ -43,6 +43,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadProviders();
 });
+
+// ==== DISPLAY HELPERS ====
+
+/** Returns the best available display name for a provider in the current language.
+ *  Priority: name_mr (from Bhashini, stored in sheet) → dictionary+transliterate fallback */
+function getProviderDisplayName(provider) {
+    if (currentLang === 'mr' && provider.name_mr) return provider.name_mr;
+    return translateProviderName(provider.name);
+}
 
 // ==== DATA LOADING ====
 // Fetches once on page load. All subsequent filtering uses in-memory data.
@@ -446,7 +455,7 @@ function createProviderCard(provider, isFeatured) {
         '<div class="card-top">' +
             '<div class="card-avatar" aria-hidden="true">' + escapeHtml(getInitials(provider.name)) + '</div>' +
             '<div class="card-meta">' +
-                '<h3 class="card-name">' + escapeHtml(translateProviderName(provider.name)) + '</h3>' +
+                '<h3 class="card-name">' + escapeHtml(getProviderDisplayName(provider)) + '</h3>' +
                 servicesHtml +
                 '<p class="card-location">📍 ' + displayAddress + '</p>' +
                 (displayArea
@@ -598,6 +607,7 @@ function matchesAdvancedSearch(provider, searchText) {
 
     const searchFields = [
         (provider.name || '').toLowerCase(),
+        (provider.name_mr || '').toLowerCase(),
         translateProviderName(provider.name || '').toLowerCase(),
         (provider.area || '').toLowerCase(),
         translateAreaLabel(provider.area || '').toLowerCase(),
