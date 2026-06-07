@@ -351,8 +351,8 @@ function buildCategoryGrid() {
 // Returns emoji for a broad category name
 function getCategoryEmoji(category) {
     const c = (category || '').toLowerCase();
-    if (c.includes('home'))                                    return '🏠';
     if (c.includes('construct') || c.includes('improvement')) return '🏗️';
+    if (c.includes('home'))                                    return '🏠';
     if (c.includes('health') || c.includes('medical'))        return '🏥';
     if (c.includes('professional'))                           return '💼';
     if (c.includes('auto') || c.includes('vehicle'))          return '🚗';
@@ -365,8 +365,8 @@ function getCategoryEmoji(category) {
 // Returns the CSS color class for the cat-icon circle
 function getCategoryColorClass(category) {
     const c = (category || '').toLowerCase();
-    if (c.includes('home'))                                    return 'cat-home';
     if (c.includes('construct') || c.includes('improvement')) return 'cat-construction';
+    if (c.includes('home'))                                    return 'cat-home';
     if (c.includes('health') || c.includes('medical'))        return 'cat-health';
     if (c.includes('professional'))                           return 'cat-professional';
     if (c.includes('auto') || c.includes('vehicle'))          return 'cat-automobile';
@@ -492,6 +492,7 @@ function applyAllFilters() {
     const sortFilter = document.getElementById('sortFilter');
     const selectedSort = sortFilter ? sortFilter.value : 'default';
 
+
     const filteredProviders = allProviders.filter(function(provider) {
         const matchesSearch = !searchText || matchesAdvancedSearch(provider, searchText);
 
@@ -604,7 +605,7 @@ function showBrowsePrompt() {
                 if (customServiceSelect) customServiceSelect._renderTrigger();
             }
             applyAllFilters();
-            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+            scrollToListings();
         });
     });
 }
@@ -975,6 +976,14 @@ function animateValue(element, start, end, duration) {
 }
 
 // XSS prevention
+// Scroll to the listings section with a small top gap so it doesn't feel flush
+function scrollToListings() {
+    const el = document.getElementById('allProviders');
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - 16;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
 function escapeHtml(text) {
     return String(text)
         .replace(/&/g, '&amp;')
@@ -1029,9 +1038,52 @@ function setServiceFilterByKeyword(keyword) {
 
 // ==== CLEAR FILTERS ====
 
+// Rebuild the services dropdown to only show services belonging to the given category.
+// Pass empty string to restore all services.
+function filterServiceDropdownByCategory(category) {
+    const dropdown = document.getElementById('serviceFilter');
+    if (!dropdown) return;
+
+    // Remove all options except the first "All Services" placeholder
+    while (dropdown.options.length > 1) dropdown.remove(1);
+
+    const serviceCounts = {};
+    allProviders.forEach(function(p) {
+        (p.services || []).forEach(function(s) {
+            if (s.name) serviceCounts[s.name] = (serviceCounts[s.name] || 0) + 1;
+        });
+    });
+
+    const filteredServices = category
+        ? allServices.filter(function(svc) {
+            return allProviders.some(function(p) {
+                return (p.services || []).some(function(s) {
+                    return s.name === svc && s.category === category;
+                });
+            });
+        })
+        : allServices;
+
+    filteredServices.forEach(function(service) {
+        const count  = serviceCounts[service] || 0;
+        const option = document.createElement('option');
+        option.value = service;
+        option.textContent = translateServiceLabel(service) + ' (' + toLocalNum(count) + ')';
+        dropdown.appendChild(option);
+    });
+
+    dropdown.value = '';
+    if (customServiceSelect) {
+        customServiceSelect.refresh();
+        customServiceSelect._renderTrigger();
+    }
+}
+
 function clearAllFilters() {
     document.getElementById('searchBox').value = '';
     selectedCategory = '';
+
+    filterServiceDropdownByCategory('');  // restore full services list
 
     if (customServiceSelect) customServiceSelect.reset();
     else document.getElementById('serviceFilter').value = '';
@@ -1043,7 +1095,7 @@ function clearAllFilters() {
     document.querySelectorAll('.area-chip').forEach(function(c) { c.classList.remove('active'); });
 
     applyAllFilters();
-    document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToListings();
 }
 
 function initClearFiltersButton() {
@@ -1113,7 +1165,7 @@ function initCategoryTiles() {
         // "More Services" — show all & clear filters
         if (tile.classList.contains('category-more')) {
             clearAllFilters();
-            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+            scrollToListings();
             return;
         }
 
@@ -1125,13 +1177,15 @@ function initCategoryTiles() {
         if (tile.hasAttribute('data-category-filter')) {
             if (isActive) {
                 selectedCategory = '';
+                filterServiceDropdownByCategory('');   // restore all services
             } else {
                 tile.classList.add('active');
                 selectedCategory = tile.getAttribute('data-category-filter');
                 document.getElementById('serviceFilter').value = '';
+                filterServiceDropdownByCategory(selectedCategory);
             }
             applyAllFilters();
-            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+            scrollToListings();
 
         } else if (tile.hasAttribute('data-service-filter')) {
             if (!isActive) {
@@ -1142,7 +1196,7 @@ function initCategoryTiles() {
                 document.getElementById('serviceFilter').value = '';
             }
             applyAllFilters();
-            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+            scrollToListings();
         }
     });
 }
@@ -1157,7 +1211,7 @@ function initViewAllLinks() {
     if (viewAllCategories) {
         viewAllCategories.addEventListener('click', function() {
             clearAllFilters();
-            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+            scrollToListings();
         });
     }
 }
@@ -1184,8 +1238,13 @@ function initAreaChips() {
                 chip.classList.add('active');
                 if (areaFilter) areaFilter.value = area;
             }
+            // Keep the area dropdown in sync with the chip
+            if (customAreaSelect) {
+                customAreaSelect.refresh();
+                customAreaSelect._renderTrigger();
+            }
             applyAllFilters();
-            document.getElementById('allProviders')?.scrollIntoView({ behavior: 'smooth' });
+            scrollToListings();
         });
     }
 
