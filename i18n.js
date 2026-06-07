@@ -178,50 +178,121 @@ const TRANSLATIONS = {
 };
 
 /** Area names → Marathi (exact full-name keys take priority; single-word keys used for word-by-word fallback) */
+// ── AREA_LABELS_MR ───────────────────────────────────────────────────────────
+// SOURCE OF TRUTH: every canonical area name from fixAreas.gs AREA_KEYWORDS
+// must have an explicit full-name entry here.
+// After adding new areas to fixAreas.gs, add the Marathi entry here too.
+// ─────────────────────────────────────────────────────────────────────────────
 const AREA_LABELS_MR = {
-    // Full compound area names (checked first as exact matches)
-    'n4 cidco': 'N4 सिडको',
-    'n1 cidco': 'N1 सिडको',
-    'n2 cidco': 'N2 सिडको',
-    'n 2': 'N 2',
-    'n 1': 'N 1',
-    'chetak ghoda': 'चेतक घोडा',
-    'sindhi colony': 'सिंधी कॉलनी',
-    'jalna road': 'जालना रोड',
-    'beed bypass': 'बीड बायपास',
-    'chhatrapati sambhajinagar': 'छत्रपती संभाजीनगर',
+    // ── CIDCO Nodes ──────────────────────────────────────────────────────────
+    'n1 cidco':        'N1 सिडको',
+    'n2 cidco':        'N2 सिडको',
+    'n3 cidco':        'N3 सिडको',
+    'n4 cidco':        'N4 सिडको',
+    'n5 cidco':        'N5 सिडको',
+    'n6 cidco':        'N6 सिडको',
+    'n7 cidco':        'N7 सिडको',
+    'n8 cidco':        'N8 सिडको',
+    'n9 cidco':        'N9 सिडको',
+    'n10 cidco':       'N10 सिडको',
+    'n11 cidco':       'N11 सिडको',
+    'n12 hudco':       'N12 हुडको',
+    'n 1':             'N 1',
+    'n 2':             'N 2',
+    'n 4':             'N 4',
 
-    // Single-word keys — used word-by-word when full name has no exact match
-    cidco: 'सिडको',
-    garkheda: 'गरखेडा',
-    mukundwadi: 'मुकुंदवाडी',
-    satara: 'सातारा',
-    osmanpura: 'उस्मानपुरा',
-    shahnoorwadi: 'शहनूरवाडी',
-    aurangabad: 'औरंगाबाद',
-    aurangpura: 'औरंगपुरा',
-    whitefield: 'व्हाइटफील्ड',
-    sambhajinagar: 'संभाजीनगर',
-    cantonment: 'छावणी',
-    chikalthana: 'चिकलठाणा',
-    ulkanagari: 'उल्कानगरी',
-    nashik: 'नाशिक',
-    pune: 'पुणे',
-    mumbai: 'मुंबई',
-    sindhi: 'सिंधी',
-    chetak: 'चेतक',
-    ghoda: 'घोडा',
-    gajanan: 'गजानन',
-    buddha: 'बुद्ध',
-    arihant: 'अरिहंत',
-    uttam: 'उत्तम',
-    vishnu: 'विष्णू',
-    mondha: 'मोंढा',
-    nagar: 'नगर',
-    road: 'रोड',
-    colony: 'कॉलनी',
-    chowk: 'चौक',
-    pura: 'पुरा'
+    // ── Old City / Aurangabad Core ───────────────────────────────────────────
+    'osmanpura':            'उस्मानपुरा',
+    'garkheda':             'गरखेडा',
+    'garkheda parisar':     'गरखेडा परिसर',
+    'bajaj nagar':          'बजाज नगर',
+    'roshan gate':          'रोशन गेट',
+    'gulmandi':             'गुलमंडी',
+    'kranti chowk':         'क्रांती चौक',
+    'aurangpura':           'औरंगपुरा',
+    'jalna road':           'जालना रोड',
+    'beed bypass':          'बीड बायपास',
+    'satara parisar':       'सातारा परिसर',
+    'pundliknagar':         'पुंडलिकनगर',
+    'pundaliknagar':        'पुंडलिकनगर',
+    'mukundwadi':           'मुकुंदवाडी',
+    'waluj':                'वाळूज',
+    'waluj midc':           'वाळूज एमआयडीसी',
+    'chikalthana':          'चिकलठाणा',
+    'cantonment':           'छावणी',
+    'padegaon':             'पाडेगाव',
+    'harsul':               'हर्सूल',
+    'nirala bazar':         'निरला बाजार',
+    'samarth nagar':        'समर्थ नगर',
+    'chetak ghoda':         'चेतक घोडा',
+    'jaibhimnagar':         'जयभीमनगर',
+    'jai bhim nagar':       'जयभीम नगर',
+    'gajanan colony':       'गजानन कॉलनी',
+    'vijay nagar':          'विजय नगर',
+    'tanaji chowk':         'तानाजी चौक',
+    'shivshankar colony':   'शिवशंकर कॉलनी',
+    'sindhi colony':        'सिंधी कॉलनी',
+
+    // ── Additional Areas ─────────────────────────────────────────────────────
+    'sutgirni':             'सुतगिरणी',
+    'baudhh nagar':         'बौद्ध नगर',
+    'baudha nagar':         'बौद्ध नगर',
+    'baudh nagar':          'बौद्ध नगर',
+    'bodhh nagar':          'बौद्ध नगर',
+    'uttam nagar':          'उत्तम नगर',
+    'jalgaon road':         'जळगाव रोड',
+    'bansilal nagar':       'बनसीलाल नगर',
+    'bhanudas nagar':       'भानुदास नगर',
+    'bhanuds nagar':        'भानुदास नगर',
+    'bhoivad':              'भोयवाड',
+    'chawani':              'छावणी',
+    'ulkanagari':           'उल्कानगरी',
+    'ulka nagari':          'उल्का नगरी',
+    'shahnoorwadi':         'शहनूरवाडी',
+    'shahnur wadi':         'शहनूरवाडी',
+
+    // ── City / Region ────────────────────────────────────────────────────────
+    'chhatrapati sambhajinagar': 'छत्रपती संभाजीनगर',
+    'sambhajinagar':        'संभाजीनगर',
+    'aurangabad':           'औरंगाबाद',
+    'nashik':               'नाशिक',
+    'pune':                 'पुणे',
+    'mumbai':               'मुंबई',
+
+    // ── Individual word keys — used word-by-word for compound names not above ─
+    cidco:        'सिडको',
+    hudco:        'हुडको',
+    midc:         'एमआयडीसी',
+    parisar:      'परिसर',
+    satara:       'सातारा',
+    whitefield:   'व्हाइटफील्ड',
+    chikalthana:  'चिकलठाणा',
+    cantonment:   'छावणी',
+    sindhi:       'सिंधी',
+    chetak:       'चेतक',
+    ghoda:        'घोडा',
+    gajanan:      'गजानन',
+    buddha:       'बुद्ध',
+    baudha:       'बौद्ध',
+    baudhh:       'बौद्ध',
+    arihant:      'अरिहंत',
+    uttam:        'उत्तम',
+    vishnu:       'विष्णू',
+    mondha:       'मोंढा',
+    vijay:        'विजय',
+    samarth:      'समर्थ',
+    tanaji:       'तानाजी',
+    shivaji:      'शिवाजी',
+    bajaj:        'बजाज',
+    nirala:       'निरला',
+    bazar:        'बाजार',
+    nagar:        'नगर',
+    road:         'रोड',
+    colony:       'कॉलनी',
+    chowk:        'चौक',
+    pura:         'पुरा',
+    wadi:         'वाडी',
+    gate:         'गेट',
 };
 
 const CONSONANT_MR = {
@@ -295,60 +366,405 @@ const PROVIDER_NAME_PARTS_MR = {
     kale: 'काळे', kolhe: 'कोळहे',
 };
 
-/** Common service names from sheet → Marathi display.
- *  Longer / more-specific entries must come before shorter ones
- *  so the word-boundary matcher finds the best match first. */
+// ── SERVICE_LABELS_MR ─────────────────────────────────────────────────────────
+// SOURCE OF TRUTH: every canonical service name from fixServices.gs SERVICE_MAP
+// must have a full-name entry here (exact match = fastest path, no fallback needed).
+// When adding new services to fixServices.gs, add the Marathi entry here too.
+// ─────────────────────────────────────────────────────────────────────────────
 const SERVICE_LABELS_MR = {
+    // ── Full canonical service names (from fixServices.gs) ────────────────
     // Electrical
-    electrician: 'इलेक्ट्रिशियन',
-    electric: 'इलेक्ट्रिक',
-    electrical: 'इलेक्ट्रिकल',
+    'electrician':                   'इलेक्ट्रिशियन',
 
     // Plumbing
-    plumber: 'प्लंबर',
-    plumbing: 'प्लंबिंग',
+    'plumber':                        'प्लंबर',
+
+    // Carpentry
+    'carpenter':                      'सुतार',
+
+    // AC / Cooling
+    'ac repair':                      'एसी दुरुस्ती',
+    'ac service':                     'एसी सेवा',
+    'ac servicing':                   'एसी सर्व्हिसिंग',
+
+    // Painting
+    'painter':                        'पेंटर',
+
+    // Two Wheeler
+    'two wheeler repair':             'दुचाकी दुरुस्ती',
+    'two wheeler repair and servicing': 'दुचाकी दुरुस्ती व सर्व्हिसिंग',
+    '2 wheeler repair':               'दुचाकी दुरुस्ती',
+    '2 wheeler repair and servicing': 'दुचाकी दुरुस्ती व सर्व्हिसिंग',
+
+    // Four Wheeler / Car
+    'car repair':                     'कार दुरुस्ती',
+    'car service':                    'कार सेवा',
+
+    // Auto Rickshaw
+    'auto rickshaw':                  'ऑटो रिक्षा',
+
+    // Taxi
+    'taxi service':                   'टॅक्सी सेवा',
+
+    // Construction
+    'construction':                   'बांधकाम',
+    'tile contractor':                'टाइल कंत्राटदार',
+
+    // Fabrication / Welding
+    'fabrication':                    'फॅब्रिकेशन',
+
+    // Computer / IT
+    'computer repair':                'संगणक दुरुस्ती',
+    'computer printer sales':         'संगणक प्रिंटर विक्री',
+    'computer sales':                 'संगणक विक्री',
+    'computer sales and repair':      'संगणक विक्री व दुरुस्ती',
+
+    // CCTV
+    'cctv installation':              'सीसीटीव्ही स्थापना',
+
+    // Mobile
+    'mobile repair':                  'मोबाईल दुरुस्ती',
+
+    // DTH / Cable
+    'dth & cable service':            'डीटीएच व केबल सेवा',
+    'dth and cable service':          'डीटीएच व केबल सेवा',
+    'dthing & cable service':         'डीटीएच व केबल सेवा',
+    'dth fitting':                    'डीटीएच फिटिंग',
+
+    // Aluminium Work
+    'aluminium work':                 'ॲल्युमिनियम काम',
+    'aluminium window':               'ॲल्युमिनियम खिडकी',
+    'aluminium windows':              'ॲल्युमिनियम खिडक्या',
+    'aluminium door':                 'ॲल्युमिनियम दरवाजा',
+
+    // Milk
+    'milk delivery':                  'दूध वितरण',
+
+    // Laundry
+    'laundry':                        'कपडे धुणे',
+    'curtain wash':                   'पडदा धुणे',
+    'cloth wash':                     'कपडे धुणे',
+
+    // Tailoring
+    'tailoring':                      'शिवणकाम',
+
+    // Salon / Grooming
+    'salon':                          'सलून',
+
+    // Catering
+    'catering':                       'केटरिंग',
+
+    // Event Management
+    'event management':               'कार्यक्रम व्यवस्थापन',
+
+    // Pest Control
+    'pest control':                   'कीटक नियंत्रण',
+
+    // Cleaning
+    'cleaning service':               'साफसफाई सेवा',
+    'cleaning services':              'साफसफाई सेवा',
+
+    // Flex Board / Printing
+    'flex board & printing':          'फ्लेक्स बोर्ड व मुद्रण',
+    'flex board and printing':        'फ्लेक्स बोर्ड व मुद्रण',
+
+    // Agriculture
+    'agriculture service':            'कृषी सेवा',
+    'agro tourism':                   'कृषी पर्यटन',
+    'digging and cutting of trees':   'झाडे खोदणे व छाटणे',
+    'digging & cutting of trees':     'झाडे खोदणे व छाटणे',
+    'tree cutting':                   'झाड छाटणे',
+
+    // Home Repair
+    'home repair':                    'घर दुरुस्ती',
+    'home repairs':                   'घर दुरुस्ती',
+    'all home repairs':               'सर्व घर दुरुस्ती',
+
+    // Appliance Repair
+    'appliance repair':               'उपकरण दुरुस्ती',
+    'washing machine repair':         'वॉशिंग मशीन दुरुस्ती',
+
+    // Grocery
+    'grocery & retail':               'किराणा व किरकोळ',
+    'grocery and retail':             'किराणा व किरकोळ',
+
+    // Heavy Vehicle
+    'heavy vehicle repair':           'अवजड वाहन दुरुस्ती',
+
+    // Tourism
+    'tourism':                        'पर्यटन',
+
+    // Electronics
+    'electronics repair':             'इलेक्ट्रॉनिक्स दुरुस्ती',
+
+    // Gas Appliance
+    'gas appliance repair':           'गॅस उपकरण दुरुस्ती',
+
+    // Furniture & Upholstery
+    'furniture & upholstery':         'फर्निचर व असबाब',
+    'furniture and upholstery':       'फर्निचर व असबाब',
+
+    // Solar
+    'solar & kitchen services':       'सौर व स्वयंपाकघर सेवा',
+    'solar and kitchen services':     'सौर व स्वयंपाकघर सेवा',
+    'solar panel':                    'सौर पॅनेल',
+
+    // Jhula
+    'jhula fitting':                  'झुला फिटिंग',
+
+    // ── Individual keyword entries (word-by-word fallback) ────────────────
+
+    // Electrical
+    electric:              'इलेक्ट्रिक',
+    electrical:            'इलेक्ट्रिकल',
+    wiring:                'वायरिंग',
+    mseb:                  'एमएसईबी',
+    switchboard:           'स्विचबोर्ड',
+
+    // Plumbing
+    plumbing:              'प्लंबिंग',
+    pipe:                  'पाईप',
+    drainage:              'ड्रेनेज',
+    sanitary:              'सॅनिटरी',
 
     // Carpentry / Furniture
-    carpenter: 'सुतार',
-    carpentry: 'सुतारकाम',
-    furniture: 'फर्निचर',
+    carpentry:             'सुतारकाम',
+    furniture:             'फर्निचर',
+    sofa:                  'सोफा',
+    upholstery:            'असबाब',
+    cushion:               'उशी',
+    mattress:              'गादी',
 
     // Tiles & Construction
-    'tile contractor': 'टाइल कंत्राटदार',
-    'tile work': 'टाइल काम',
-    tile: 'टाइल',
-    contractor: 'कंत्राटदार',
-    fabrication: 'फॅब्रिकेशन',
-    mason: 'गवंडी',
-    masonry: 'गवंडीकाम',
-    welding: 'वेल्डिंग',
-    construction: 'बांधकाम',
-    civil: 'सिव्हिल',
+    'tile work':           'टाइल काम',
+    tile:                  'टाइल',
+    tiles:                 'टाइल्स',
+    contractor:            'कंत्राटदार',
+    mason:                 'गवंडी',
+    masonry:               'गवंडीकाम',
+    welding:               'वेल्डिंग',
+    civil:                 'सिव्हिल',
+    interior:              'इंटेरियर',
+    architect:             'आर्किटेक्ट',
+    building:              'इमारत',
+    rangkam:               'रंगकाम',
+
+    // Two-wheeler / Automobile
+    '2 wheeler':           'दुचाकी',
+    'two wheeler':         'दुचाकी',
+    wheeler:               'चाकी',
+    bike:                  'बाईक',
+    motorcycle:            'मोटारसायकल',
+    scooter:               'स्कूटर',
+    tyre:                  'टायर',
+    tire:                  'टायर',
+    puncture:              'पंक्चर',
+    automobile:            'वाहन',
+    vehicle:               'वाहन',
+    garage:                'गॅरेज',
 
     // Transport
-    taxi: 'टॅक्सी',
-    cab: 'टॅक्सी',
-    auto: 'ऑटो',
-    rickshaw: 'रिक्षा',
-    transport: 'वाहतूक',
+    taxi:                  'टॅक्सी',
+    cab:                   'टॅक्सी',
+    auto:                  'ऑटो',
+    rickshaw:              'रिक्षा',
+    transport:             'वाहतूक',
+    driver:                'चालक',
+    ambulance:             'रुग्णवाहिका',
+    tractor:               'ट्रॅक्टर',
+    truck:                 'ट्रक',
 
-    // Home services
-    milk: 'दूध',
-    painter: 'पेंटर',
-    painting: 'पेंटिंग',
-    cleaning: 'साफसफाई',
-    'pest control': 'कीटक नियंत्रण',
-    pest: 'कीटक नियंत्रण',
-    gardening: 'बागकाम',
-    security: 'सुरक्षा',
-    catering: 'केटरिंग',
+    // Home Services
+    milk:                  'दूध',
+    dairy:                 'डेअरी',
+    painter:               'पेंटर',
+    painting:              'पेंटिंग',
+    cleaning:              'साफसफाई',
+    housekeeping:          'घरगुती सेवा',
+    pest:                  'कीटक',
+    gardening:             'बागकाम',
+    garden:                'बाग',
+    security:              'सुरक्षा',
+    tiffin:                'टिफिन',
+    dhobi:                 'धोबी',
+    cook:                  'स्वयंपाकी',
+    cooking:               'स्वयंपाक',
+    maid:                  'मोलकरीण',
+    helper:                'मदतनीस',
+    all:                   'सर्व',
+    home:                  'घर',
+    house:                 'घर',
+    curtain:               'पडदा',
+    cloth:                 'कपडे',
+    wash:                  'धुणे',
+    ironing:               'इस्त्री',
+    sweeping:              'झाडणे',
+    floor:                 'फरशी',
 
     // AC / Appliances
-    'ac service': 'एसी सेवा',
-    'ac repair': 'एसी दुरुस्ती',
-    ac: 'एसी',
-    repair: 'दुरुस्ती',
-    service: 'सेवा'
+    ac:                    'एसी',
+    refrigerator:          'फ्रिज',
+    fridge:                'फ्रिज',
+    'washing machine':     'वॉशिंग मशीन',
+    washing:               'वॉशिंग',
+    cooler:                'कूलर',
+    geyser:                'गीझर',
+    inverter:              'इन्व्हर्टर',
+    battery:               'बॅटरी',
+    appliance:             'उपकरण',
+    appliances:            'उपकरणे',
+    microwave:             'मायक्रोवेव्ह',
+    oven:                  'ओव्हन',
+
+    // Aluminium / Doors / Windows
+    aluminium:             'ॲल्युमिनियम',
+    aluminum:              'ॲल्युमिनियम',
+    upvc:                  'यूपीव्हीसी',
+    window:                'खिडकी',
+    windows:               'खिडक्या',
+    door:                  'दरवाजा',
+    doors:                 'दरवाजे',
+    gate:                  'गेट',
+    grill:                 'ग्रिल',
+    grills:                'ग्रिल',
+
+    // CCTV / Electronics / IT
+    cctv:                  'सीसीटीव्ही',
+    camera:                'कॅमेरा',
+    computer:              'संगणक',
+    laptop:                'लॅपटॉप',
+    printer:               'प्रिंटर',
+    mobile:                'मोबाईल',
+    internet:              'इंटरनेट',
+    network:               'नेटवर्क',
+    software:              'सॉफ्टवेअर',
+    hardware:              'हार्डवेअर',
+    television:            'दूरदर्शन',
+    tv:                    'टीव्ही',
+    fan:                   'पंखा',
+    led:                   'एलईडी',
+    lcd:                   'एलसीडी',
+
+    // Agriculture / Tourism
+    agro:                  'कृषी',
+    agriculture:           'शेती',
+    farm:                  'शेत',
+    farming:               'शेती',
+    travel:                'प्रवास',
+    irrigation:            'सिंचन',
+    drip:                  'ठिबक',
+    digging:               'खोदकाम',
+    cutting:               'छाटणे',
+    tree:                  'झाड',
+    trees:                 'झाडे',
+    trimming:              'छाटणी',
+
+    // Health / Medical
+    doctor:                'डॉक्टर',
+    medical:               'वैद्यकीय',
+    clinic:                'दवाखाना',
+    hospital:              'रुग्णालय',
+    pharmacy:              'औषधालय',
+    physiotherapy:         'फिजिओथेरपी',
+    nursing:               'नर्सिंग',
+    dentist:               'दंतवैद्य',
+
+    // Professional
+    advocate:              'वकील',
+    lawyer:                'वकील',
+    accountant:            'लेखापाल',
+    insurance:             'विमा',
+    notary:                'नोटरी',
+    consultant:            'सल्लागार',
+    tutor:                 'शिक्षक',
+    coaching:              'कोचिंग',
+    classes:               'वर्ग',
+    photography:           'छायाचित्रण',
+    photographer:          'छायाचित्रकार',
+    event:                 'कार्यक्रम',
+    events:                'कार्यक्रम',
+    decoration:            'सजावट',
+    balloon:               'फुगा',
+    mandap:                'मंडप',
+
+    // Printing / Flex
+    flex:                  'फ्लेक्स',
+    banner:                'बॅनर',
+    hoarding:              'होर्डिंग',
+    signage:               'साईनेज',
+    board:                 'बोर्ड',
+    printing:              'मुद्रण',
+
+    // Jhula / Fitting
+    jhula:                 'झुला',
+    fitting:               'फिटिंग',
+    installation:          'स्थापना',
+
+    // Water / Borewell
+    water:                 'पाणी',
+    borewell:              'बोरवेल',
+    bore:                  'बोर',
+    pump:                  'पंप',
+    tanker:                'टँकर',
+
+    // D2H / Dish
+    d2h:                   'डीटूएच',
+    dish:                  'डिश',
+    dth:                   'डीटीएच',
+    cable:                 'केबल',
+
+    // Gas
+    gas:                   'गॅस',
+    burner:                'बर्नर',
+    stove:                 'शेगडी',
+    lpg:                   'एलपीजी',
+    chimney:               'चिमणी',
+
+    // Grocery
+    grocery:               'किराणा',
+    kirana:                'किराणा',
+    wholesale:             'घाऊक',
+    retail:                'किरकोळ',
+
+    // Solar
+    solar:                 'सौर',
+    panel:                 'पॅनेल',
+
+    // Salon / Tailoring
+    salon:                 'सलून',
+    barber:                'नाभिक',
+    parlour:               'पार्लर',
+    tailor:                'शिंपी',
+    stitching:             'शिवणकाम',
+    blouse:                'ब्लाउज',
+    silai:                 'शिलाई',
+
+    // Sales-related
+    sales:                 'विक्री',
+    sale:                  'विक्री',
+
+    // Common connector / modifier words
+    and:                   'आणि',
+    repair:                'दुरुस्ती',
+    repairs:               'दुरुस्ती',
+    repairing:             'दुरुस्ती',
+    servicing:             'सर्व्हिसिंग',
+    service:               'सेवा',
+    services:              'सेवा',
+    work:                  'काम',
+    shop:                  'दुकान',
+    center:                'केंद्र',
+    centre:                'केंद्र',
+    supply:                'पुरवठा',
+    supplier:              'पुरवठादार',
+    dealer:                'विक्रेता',
+    management:            'व्यवस्थापन',
+    delivery:              'वितरण',
+    new:                   'नवीन',
+    old:                   'जुने',
+    local:                 'स्थानिक',
+    general:               'सामान्य',
+    maintenance:           'देखभाल',
 };
 
 let currentLang = 'en';
@@ -477,21 +893,24 @@ function translateAreaLabel(area) {
     if (currentLang === 'en' || !area) return area;
 
     const lower = area.toLowerCase().trim();
-    // Exact match for the full area string
+    // 1. Exact match for the full area string
     if (AREA_LABELS_MR[lower]) return AREA_LABELS_MR[lower];
 
-    // Word-by-word: translate known words, transliterate the rest.
-    // Words containing digits (e.g. "N4") or single characters (e.g. "N") are kept as-is.
+    // 2. Word-by-word: translate known words, keep unknown words in English.
+    //    Area names are proper nouns — phonetic transliteration of unknown words
+    //    produces wrong output (e.g. "Baudhh" → "बौदह" instead of "बौद्ध").
+    //    Keeping unknown words in English is far more readable.
     const words = area.trim().split(/\s+/);
     const result = words.map(function(word) {
-        // Strip surrounding punctuation (commas, dots, dashes) but preserve for rejoining
-        const leadingPunct  = word.match(/^[,.\-–—;:]+/) ? word.match(/^[,.\-–—;:]+/)[0] : '';
-        const trailingPunct = word.match(/[,.\-–—;:]+$/) ? word.match(/[,.\-–—;:]+$/)[0] : '';
+        const leadingPunct  = (word.match(/^[,.\-–—;:]+/) || [''])[0];
+        const trailingPunct = (word.match(/[,.\-–—;:]+$/) || [''])[0];
         const core = word.slice(leadingPunct.length, word.length - trailingPunct.length);
-        if (!core || /\d/.test(core) || core.length === 1) return word;
+        // Keep numbers, single chars, and abbreviations (N4, MIDC…) as-is
+        if (!core || /\d/.test(core) || core.length <= 2) return word;
         const cl = core.toLowerCase();
         if (AREA_LABELS_MR[cl]) return leadingPunct + AREA_LABELS_MR[cl] + trailingPunct;
-        return leadingPunct + transliterateWord(core) + trailingPunct;
+        // Unknown proper-noun word — keep English rather than produce bad phonetics
+        return word;
     });
     return result.join(' ');
 }
@@ -512,14 +931,34 @@ function translateProviderName(name) {
 function translateServiceLabel(service) {
     if (currentLang === 'en' || !service) return service;
     const lower = service.toLowerCase().trim();
-    // Exact match first
+
+    // 1. Exact match on the full service name
     if (SERVICE_LABELS_MR[lower]) return SERVICE_LABELS_MR[lower];
-    // Word-boundary match: avoids false hits like "contractor" matching "ac"
-    for (const [keyword, label] of Object.entries(SERVICE_LABELS_MR)) {
+
+    // 2. Multi-word phrase match (longest-key-first to avoid partial hits)
+    const sortedKeys = Object.keys(SERVICE_LABELS_MR).sort(function(a, b) { return b.length - a.length; });
+    for (const keyword of sortedKeys) {
+        if (keyword.indexOf(' ') === -1) continue; // skip single-word keys here
         const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        if (new RegExp('\\b' + escaped + '\\b').test(lower)) return label;
+        if (new RegExp('\\b' + escaped + '\\b').test(lower)) return SERVICE_LABELS_MR[keyword];
     }
-    return transliterateLatin(service);
+
+    // 3. Word-by-word fallback — same pattern as translateAreaLabel.
+    //    Each word is looked up in SERVICE_LABELS_MR; truly unknown words are
+    //    kept in English (readable) rather than phonetically mangled.
+    const words = service.trim().split(/\s+/);
+    return words.map(function(word) {
+        const leadingPunct  = (word.match(/^[,.\-–—;:]+/) || [''])[0];
+        const trailingPunct = (word.match(/[,.\-–—;:]+$/) || [''])[0];
+        const core = word.slice(leadingPunct.length, word.length - trailingPunct.length);
+        if (!core) return word;
+        // Keep numbers, single chars, and known abbreviations (CCTV, AC, D2H…) as-is
+        if (/\d/.test(core) || core.length <= 2) return word;
+        const cl = core.toLowerCase();
+        if (SERVICE_LABELS_MR[cl]) return leadingPunct + SERVICE_LABELS_MR[cl] + trailingPunct;
+        // Unknown word — keep original English rather than producing bad phonetics
+        return word;
+    }).join(' ');
 }
 
 function translateStatusLabel(status) {
@@ -537,3 +976,61 @@ function initI18n() {
     if (langEn) langEn.addEventListener('click', () => setLanguage('en'));
     if (langMr) langMr.addEventListener('click', () => setLanguage('mr'));
 }
+
+// ── DEV UTILITY: Translation Coverage Checker ─────────────────────────────────
+// Run  checkMrCoverage()  in the browser console after page loads to see which
+// services and areas are NOT covered by the dictionaries.
+// This must be run after allServices and allAreas are populated (i.e. after data loads).
+// ─────────────────────────────────────────────────────────────────────────────
+window.checkMrCoverage = function() {
+    const prevLang = currentLang;
+    currentLang = 'mr'; // force Marathi mode for the check
+
+    const services = (typeof allServices !== 'undefined') ? allServices : [];
+    const areas    = (typeof allAreas    !== 'undefined') ? allAreas    : [];
+
+    const serviceGaps = [];
+    services.forEach(function(s) {
+        const translated = translateServiceLabel(s);
+        // Flag if any word in the result is still in Latin script (not Devanagari)
+        const hasLatin = /[a-zA-Z]{3,}/.test(translated);
+        if (hasLatin) serviceGaps.push({ english: s, result: translated });
+    });
+
+    const areaGaps = [];
+    areas.forEach(function(a) {
+        const translated = translateAreaLabel(a);
+        const hasLatin = /[a-zA-Z]{3,}/.test(translated);
+        if (hasLatin) areaGaps.push({ english: a, result: translated });
+    });
+
+    currentLang = prevLang; // restore
+
+    console.group('%c🔍 Marathi Translation Coverage Report', 'font-weight:bold;font-size:14px;color:#e07b39');
+
+    if (serviceGaps.length === 0) {
+        console.log('%c✅ All services fully translated', 'color:green');
+    } else {
+        console.group('%c⚠️ Services with untranslated words (' + serviceGaps.length + ')', 'color:orange');
+        serviceGaps.forEach(function(g) {
+            console.log('  EN: "' + g.english + '"  →  MR: "' + g.result + '"');
+        });
+        console.groupEnd();
+        console.log('%cFix: add the missing words to SERVICE_LABELS_MR in i18n.js', 'color:gray');
+    }
+
+    if (areaGaps.length === 0) {
+        console.log('%c✅ All areas fully translated', 'color:green');
+    } else {
+        console.group('%c⚠️ Areas with untranslated words (' + areaGaps.length + ')', 'color:orange');
+        areaGaps.forEach(function(g) {
+            console.log('  EN: "' + g.english + '"  →  MR: "' + g.result + '"');
+        });
+        console.groupEnd();
+        console.log('%cFix: add the missing area names to AREA_LABELS_MR in i18n.js', 'color:gray');
+    }
+
+    console.groupEnd();
+
+    return { serviceGaps, areaGaps };
+};
