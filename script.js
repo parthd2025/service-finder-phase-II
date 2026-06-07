@@ -98,6 +98,7 @@ function loadProviders() {
             extractUniqueServices();
             if (allAreas.length === 0) extractUniqueAreas();
             buildServiceEmojiMap();
+            buildServiceAreaMaps();
 
             loadingMessage.style.display = 'none';
 
@@ -150,6 +151,31 @@ function buildServiceEmojiMap() {
     });
 }
 
+// ==== SERVICE ↔ AREA RELATIONSHIP MAPS ====
+// Built once after data loads; used to cascade/filter the two dropdowns.
+
+let serviceToAreas = {}; // { "AC Repair": Set(["N1 Cidco", ...]) }
+let areaToServices = {}; // { "N1 Cidco": Set(["AC Repair", ...]) }
+
+function buildServiceAreaMaps() {
+    serviceToAreas = {};
+    areaToServices = {};
+
+    allProviders.forEach(function(p) {
+        const area = (p.area || '').trim();
+        (p.services || []).forEach(function(s) {
+            if (!s.name) return;
+            if (!serviceToAreas[s.name]) serviceToAreas[s.name] = new Set();
+            if (area) serviceToAreas[s.name].add(area);
+
+            if (area) {
+                if (!areaToServices[area]) areaToServices[area] = new Set();
+                areaToServices[area].add(s.name);
+            }
+        });
+    });
+}
+
 function getServiceEmoji(serviceName) {
     return serviceEmojis[serviceName] || '📋';
 }
@@ -161,7 +187,7 @@ function buildFilterOptions() {
     buildAreaFilter();
 }
 
-function buildServiceFilter() {
+function buildServiceFilter(allowedServices, contextProviders) {
     const filterDropdown = document.getElementById('serviceFilter');
     if (!filterDropdown) return;
 
@@ -170,15 +196,23 @@ function buildServiceFilter() {
 
     while (filterDropdown.options.length > 1) filterDropdown.remove(1);
 
-    // Count providers per service
+    // Count providers per service.
+    // contextProviders limits which providers contribute to the count (e.g. only those in the selected area).
+    const source = contextProviders || allProviders;
     const serviceCounts = {};
-    allProviders.forEach(function(p) {
+    source.forEach(function(p) {
         (p.services || []).forEach(function(s) {
-            if (s.name) serviceCounts[s.name] = (serviceCounts[s.name] || 0) + 1;
+            if (s.name && (!allowedServices || allowedServices.has(s.name))) {
+                serviceCounts[s.name] = (serviceCounts[s.name] || 0) + 1;
+            }
         });
     });
 
-    allServices.forEach(function(service) {
+    const servicesToShow = allowedServices
+        ? allServices.filter(function(s) { return allowedServices.has(s); })
+        : allServices;
+
+    servicesToShow.forEach(function(service) {
         const count  = serviceCounts[service] || 0;
         const option = document.createElement('option');
         option.value = service;
@@ -186,12 +220,17 @@ function buildServiceFilter() {
         filterDropdown.appendChild(option);
     });
 
+    // Restore previous value if it's still in the new list
+    if (filterDropdown._prevValue && serviceCounts[filterDropdown._prevValue] !== undefined) {
+        filterDropdown.value = filterDropdown._prevValue;
+    }
+
     updateSelectDefaults();
     if (customServiceSelect) customServiceSelect.refresh();
     else initCustomSelects();
 }
 
-function buildAreaFilter() {
+function buildAreaFilter(allowedAreas, contextProviders) {
     const filterDropdown = document.getElementById('areaFilter');
     if (!filterDropdown) return;
 
@@ -200,14 +239,22 @@ function buildAreaFilter() {
 
     while (filterDropdown.options.length > 1) filterDropdown.remove(1);
 
-    // Count providers per area for the dropdown labels
+    // Count providers per area.
+    // contextProviders limits which providers contribute to the count (e.g. only those offering the selected service).
+    const source = contextProviders || allProviders;
     const areaCounts = {};
-    allProviders.forEach(function(p) {
+    source.forEach(function(p) {
         const a = (p.area || '').trim();
-        if (a) areaCounts[a] = (areaCounts[a] || 0) + 1;
+        if (a && (!allowedAreas || allowedAreas.has(a))) {
+            areaCounts[a] = (areaCounts[a] || 0) + 1;
+        }
     });
 
-    allAreas.forEach(function(area) {
+    const areasToShow = allowedAreas
+        ? allAreas.filter(function(a) { return allowedAreas.has(a); })
+        : allAreas;
+
+    areasToShow.forEach(function(area) {
         const count  = areaCounts[area] || 0;
         const option = document.createElement('option');
         option.value = area;
@@ -215,13 +262,20 @@ function buildAreaFilter() {
         filterDropdown.appendChild(option);
     });
 
-    // "No area listed" at the bottom of the dropdown
-    const noAreaCount = allProviders.filter(function(p) { return !(p.area || '').trim(); }).length;
-    if (noAreaCount > 0) {
-        const option = document.createElement('option');
-        option.value = '__noArea';
-        option.textContent = '📋 ' + t('noAreaListed') + ' (' + toLocalNum(noAreaCount) + ')';
-        filterDropdown.appendChild(option);
+    // "No area listed" — only show when not filtered by a specific area
+    if (!allowedAreas) {
+        const noAreaCount = allProviders.filter(function(p) { return !(p.area || '').trim(); }).length;
+        if (noAreaCount > 0) {
+            const option = document.createElement('option');
+            option.value = '__noArea';
+            option.textContent = '📋 ' + t('noAreaListed') + ' (' + toLocalNum(noAreaCount) + ')';
+            filterDropdown.appendChild(option);
+        }
+    }
+
+    // Restore previous value if it's still in the new list
+    if (filterDropdown._prevValue && areaCounts[filterDropdown._prevValue] !== undefined) {
+        filterDropdown.value = filterDropdown._prevValue;
     }
 
     updateSelectDefaults();
@@ -788,6 +842,12 @@ CustomSelect.prototype._renderTrigger = function() {
     const label   = current ? this._parseOption(current).label : (this._getOptions()[0] && this._parseOption(this._getOptions()[0]).label) || '';
     this.trigger.textContent = label;
     this.trigger.setAttribute('aria-expanded', this._isOpen ? 'true' : 'false');
+    // Highlight trigger when a non-default value is selected
+    if (this.native.value && this.native.value !== '') {
+        this.trigger.classList.add('has-selection');
+    } else {
+        this.trigger.classList.remove('has-selection');
+    }
 };
 
 CustomSelect.prototype._renderOptions = function() {
@@ -1083,7 +1143,9 @@ function clearAllFilters() {
     document.getElementById('searchBox').value = '';
     selectedCategory = '';
 
-    filterServiceDropdownByCategory('');  // restore full services list
+    // Restore both dropdowns to their full (uncascaded) lists
+    buildServiceFilter();
+    buildAreaFilter();
 
     if (customServiceSelect) customServiceSelect.reset();
     else document.getElementById('serviceFilter').value = '';
@@ -1177,12 +1239,31 @@ function initCategoryTiles() {
         if (tile.hasAttribute('data-category-filter')) {
             if (isActive) {
                 selectedCategory = '';
-                filterServiceDropdownByCategory('');   // restore all services
+                buildServiceFilter(); // restore full service list
+                buildAreaFilter();    // restore full area list
             } else {
                 tile.classList.add('active');
                 selectedCategory = tile.getAttribute('data-category-filter');
                 document.getElementById('serviceFilter').value = '';
-                filterServiceDropdownByCategory(selectedCategory);
+                // Filter service dropdown to this category only
+                const catProviders = allProviders.filter(function(p) {
+                    return (p.services || []).some(function(s) { return s.category === selectedCategory; });
+                });
+                const categoryServices = new Set(
+                    catProviders.flatMap(function(p) {
+                        return (p.services || [])
+                            .filter(function(s) { return s.category === selectedCategory; })
+                            .map(function(s) { return s.name; });
+                    })
+                );
+                buildServiceFilter(categoryServices, catProviders);
+                // Filter area dropdown to areas that have this category's services
+                const categoryAreas = new Set(
+                    catProviders
+                        .map(function(p) { return (p.area || '').trim(); })
+                        .filter(Boolean)
+                );
+                buildAreaFilter(categoryAreas, catProviders);
             }
             applyAllFilters();
             scrollToListings();
@@ -1192,8 +1273,17 @@ function initCategoryTiles() {
                 tile.classList.add('active');
                 selectedCategory = '';
                 setServiceFilterByKeyword(tile.getAttribute('data-service-filter'));
+                // Cascade: show only areas that have this specific service
+                const svcValue = document.getElementById('serviceFilter').value;
+                if (svcValue && serviceToAreas[svcValue]) {
+                    const provWithSvc = allProviders.filter(function(p) {
+                        return (p.services || []).some(function(s) { return s.name === svcValue; });
+                    });
+                    buildAreaFilter(serviceToAreas[svcValue], provWithSvc);
+                }
             } else {
                 document.getElementById('serviceFilter').value = '';
+                buildAreaFilter(); // restore full area list
             }
             applyAllFilters();
             scrollToListings();
@@ -1234,9 +1324,17 @@ function initAreaChips() {
 
             if (isActive) {
                 if (areaFilter) areaFilter.value = '';
+                buildServiceFilter(); // restore full service list
             } else {
                 chip.classList.add('active');
                 if (areaFilter) areaFilter.value = area;
+                // Cascade: filter service dropdown to only services in this area
+                if (area && areaToServices[area]) {
+                    const provInArea = allProviders.filter(function(p) {
+                        return (p.area || '').trim() === area;
+                    });
+                    buildServiceFilter(areaToServices[area], provInArea);
+                }
             }
             // Keep the area dropdown in sync with the chip
             if (customAreaSelect) {
@@ -1278,15 +1376,41 @@ function addEventListeners() {
     document.getElementById('searchBox').addEventListener('input', applyAllFilters);
 
     document.getElementById('serviceFilter').addEventListener('change', function() {
+        // Sync category-tile active states
         document.querySelectorAll('.category-tile[data-service-filter]').forEach(function(tile) {
             const keyword = tile.getAttribute('data-service-filter');
             const active  = this.value && this.value.toLowerCase().includes(keyword.toLowerCase());
             tile.classList.toggle('active', active);
         }.bind(this));
+
+        // Cascade: filter the area dropdown to only show areas that have this service
+        const selectedSvc = this.value;
+        if (selectedSvc && serviceToAreas[selectedSvc]) {
+            const provWithSvc = allProviders.filter(function(p) {
+                return (p.services || []).some(function(s) { return s.name === selectedSvc; });
+            });
+            buildAreaFilter(serviceToAreas[selectedSvc], provWithSvc);
+        } else {
+            buildAreaFilter(); // restore full area list
+        }
+
         applyAllFilters();
     });
 
-    document.getElementById('areaFilter').addEventListener('change', applyAllFilters);
+    document.getElementById('areaFilter').addEventListener('change', function() {
+        // Cascade: filter the service dropdown to only show services available in this area
+        const selectedArea = this.value;
+        if (selectedArea && selectedArea !== '__noArea' && areaToServices[selectedArea]) {
+            const provInArea = allProviders.filter(function(p) {
+                return (p.area || '').trim() === selectedArea;
+            });
+            buildServiceFilter(areaToServices[selectedArea], provInArea);
+        } else {
+            buildServiceFilter(); // restore full service list
+        }
+
+        applyAllFilters();
+    });
 
     const sortFilter = document.getElementById('sortFilter');
     if (sortFilter) sortFilter.addEventListener('change', applyAllFilters);

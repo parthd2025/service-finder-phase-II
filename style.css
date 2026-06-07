@@ -652,6 +652,11 @@ body.lang-mr .footer-brand-name {
     position: relative;
 }
 
+.custom-select-trigger.has-selection {
+    color: var(--saffron);
+    font-weight: 700;
+}
+
 .custom-select-trigger::after {
     content: '▾';
     position: absolute;
