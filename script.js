@@ -25,7 +25,11 @@ let serviceEmojis  = {};  // service name → emoji (built from API data)
 let selectedCategory = ''; // Active category tile filter
 
 // ⚠️  UPDATE THIS URL after redeploying doGet.gs as a new web app deployment.
-const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZxsjlBZtmfyDolPnCCAp-QJJSe5a15PIKWC9V0x4-dhrZvwnuszEKdTGxxRa4833s/exec';
+const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZ0WUtVx3FSa3xuP2Lsi_adHPz8c_0xpyoMw-k9FMb095-ksX2AexX0BhASNC7_LHV/exec';
+
+// API access token — must match API_TOKEN in doGet.gs.
+// Change this value in BOTH files whenever you rotate the token.
+const API_TOKEN = 'csnseva_ph2_2026';
 
 // ==== INITIALIZATION ====
 document.addEventListener('DOMContentLoaded', function() {
@@ -66,7 +70,7 @@ function loadProviders() {
     errorMessage.hidden = true;
     servicesList.innerHTML = '';
 
-    fetch(GOOGLE_APPS_SCRIPT_URL)
+    fetch(GOOGLE_APPS_SCRIPT_URL + '?token=' + API_TOKEN)
         .then(function(response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.json();
@@ -86,13 +90,6 @@ function loadProviders() {
                 // Use server-provided metadata when available
             if (data.areas       && data.areas.length       > 0) allAreas       = data.areas.sort();
             if (data.categories  && data.categories.length  > 0) allCategories  = data.categories.sort();
-            }
-
-            if (allProviders.length > 0) {
-                console.log('=== PROVIDER DATA DEBUG ===');
-                console.table(allProviders[0]);
-                console.log('First provider services:', allProviders[0].services);
-                console.log('===========================');
             }
 
             extractUniqueServices();

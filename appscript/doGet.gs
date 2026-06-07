@@ -30,8 +30,21 @@
  *   "areas":      ["Garkheda", "N1 Cidco", ...]
  * }
  */
+
+// ⚠️  Keep this token in sync with API_TOKEN in script.js.
+// Change both values together whenever you rotate the token.
+var API_TOKEN = 'csnseva_ph2_2026';
+
 function doGet(e) {
   try {
+    // Token validation — reject requests without the correct token
+    var token = (e && e.parameter && e.parameter.token) ? e.parameter.token : '';
+    if (token !== API_TOKEN) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ error: 'Unauthorized' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
     // Build lookup tables
