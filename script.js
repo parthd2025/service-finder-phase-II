@@ -32,7 +32,7 @@ const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZ0WUtV
 const API_TOKEN = 'csnseva_ph2_2026';
 
 // ==== INITIALIZATION ====
-document.addEventListener('DOMContentLoaded', function() {
+if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', function() {
     initI18n();
 
     const yearEl = document.getElementById('footerYear');
@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initComingSoonButtons();
     initViewAllLinks();
     initClearFiltersButton();
+    initFooterAccordion();
 
     loadProviders();
 });
@@ -104,6 +105,7 @@ function loadProviders() {
             buildCategoryGrid();
             buildStatistics();
             buildFeaturedSection();
+            initScrollHints();
 
             addEventListeners();
             initAreaChips();
@@ -390,8 +392,9 @@ function buildCategoryGrid() {
         tile.title = count + ' provider' + (count !== 1 ? 's' : '');
 
         tile.innerHTML =
-            '<span class="cat-icon ' + colorClass + '">' + escapeHtml(emoji) + '</span>' +
-            '<span class="cat-label">' + escapeHtml(label) + ' (' + count + ')</span>';
+            '<span class="cat-icon ' + colorClass + '">' + escapeHtml(emoji) +
+            '<span class="cat-count-badge">' + toLocalNum(count) + '</span></span>' +
+            '<span class="cat-label">' + escapeHtml(label) + '</span>';
 
         const moreButton = categoryRow.querySelector('.category-more');
         if (moreButton) categoryRow.insertBefore(tile, moreButton);
@@ -917,12 +920,24 @@ CustomSelect.prototype._open = function() {
     // Position dropdown anchored to trigger using fixed coords
     const rect = this.trigger.getBoundingClientRect();
     const dropW = Math.max(rect.width, 260);
-    let left    = rect.left;
+    const maxDropH = Math.min(260, window.innerHeight - 16);
+    let left = rect.left;
+    let top = rect.bottom + 4;
+
     // Clamp to viewport right edge
     if (left + dropW > window.innerWidth - 8) left = window.innerWidth - dropW - 8;
-    this.dropdown.style.top   = (rect.bottom + 4) + 'px';
-    this.dropdown.style.left  = left + 'px';
+    if (left < 8) left = 8;
+
+    // Flip above trigger or clamp if dropdown would overflow bottom
+    if (top + maxDropH > window.innerHeight - 8) {
+        const aboveTop = rect.top - maxDropH - 4;
+        top = aboveTop >= 8 ? aboveTop : Math.max(8, window.innerHeight - maxDropH - 8);
+    }
+
+    this.dropdown.style.top = top + 'px';
+    this.dropdown.style.left = left + 'px';
     this.dropdown.style.width = dropW + 'px';
+    this.optList.style.maxHeight = maxDropH + 'px';
 
     const sel = this.optList.querySelector('.selected');
     if (sel) sel.scrollIntoView({ block: 'nearest' });
@@ -1196,6 +1211,7 @@ function refreshUiForLanguage() {
     refreshFilterOptionLabels();
     buildDynamicAreaChips();
     buildCategoryGrid();
+    initScrollHints();
 
     const loadingMessage = document.getElementById('loadingMessage');
     if (loadingMessage && loadingMessage.style.display !== 'none') {
@@ -1356,6 +1372,43 @@ function initAreaChips() {
     }
 }
 
+function initFooterAccordion() {
+    document.querySelectorAll('.footer-accordion-trigger').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            if (window.matchMedia('(min-width: 600px)').matches) return;
+
+            const col = btn.closest('.footer-accordion');
+            if (!col) return;
+
+            const isOpen = col.classList.toggle('is-open');
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+    });
+}
+
+function initScrollHints() {
+    function updateWrap(wrap, scroller) {
+        if (!wrap || !scroller) return;
+        wrap.classList.toggle('has-scroll', scroller.scrollWidth > scroller.clientWidth + 2);
+    }
+
+    const catWrap  = document.querySelector('.category-row-wrap');
+    const catRow   = document.querySelector('.category-row');
+    const areaWrap = document.querySelector('.area-chips-wrap');
+    const areaChips = document.querySelector('.area-chips');
+
+    function refresh() {
+        updateWrap(catWrap, catRow);
+        updateWrap(areaWrap, areaChips);
+    }
+
+    refresh();
+    window.addEventListener('resize', refresh);
+
+    if (catRow) catRow.addEventListener('scroll', refresh, { passive: true });
+    if (areaChips) areaChips.addEventListener('scroll', refresh, { passive: true });
+}
+
 function initFooterServiceLinks() {
     document.querySelectorAll('[data-service-filter]').forEach(function(link) {
         if (link.classList.contains('category-tile')) return;
@@ -1441,4 +1494,38 @@ function initComingSoonButtons() {
             showToast();
         });
     });
+}
+
+// ── Node.js / Jest exports ─────────────────────────────────────────────────────
+// No-op in browsers. Enables unit testing of pure utility and logic functions.
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = {
+        // Pure utilities
+        escapeHtml,
+        getInitials,
+        getServiceClass,
+        getServiceEmoji,
+        // Search / filter logic
+        matchesAdvancedSearch,
+        getActiveProviders,
+        // Data extraction
+        extractUniqueServices,
+        extractUniqueAreas,
+        buildServiceEmojiMap,
+        buildServiceAreaMaps,
+        // Display helper
+        getProviderDisplayName,
+        // State accessors — for test isolation
+        _setProviders:        function(arr) { allProviders     = arr; },
+        _setServices:         function(arr) { allServices      = arr; },
+        _setAreas:            function(arr) { allAreas         = arr; },
+        _setServiceEmojis:    function(obj) { serviceEmojis    = obj; },
+        _setSelectedCategory: function(c)   { selectedCategory = c;   },
+        _getProviders:        function()    { return allProviders;     },
+        _getServices:         function()    { return allServices;      },
+        _getAreas:            function()    { return allAreas;         },
+        _getServiceEmojis:    function()    { return serviceEmojis;    },
+        _getServiceToAreas:   function()    { return serviceToAreas;   },
+        _getAreaToServices:   function()    { return areaToServices;   },
+    };
 }

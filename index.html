@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
     <div class="page-wrap">
@@ -94,24 +94,10 @@
             </form>
         </section>
 
-        <section class="stats-section" aria-label="Platform statistics">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-value" id="statProviders">—</span>
-                    <span class="stat-label" data-i18n="statProviders">Active Providers</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="statServices">—</span>
-                    <span class="stat-label" data-i18n="statServices">Service Categories</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="statAreas">—</span>
-                    <span class="stat-label" data-i18n="statAreas">Areas Covered</span>
-                </div>
-            </div>
-        </section>
-
-        <section class="category-row" aria-label="Service categories">
+        <section class="category-section" aria-labelledby="category-heading">
+            <h2 id="category-heading" class="category-section-heading" data-i18n="popularCategories">Popular categories</h2>
+            <div class="category-row-wrap">
+                <div class="category-row" aria-label="Service categories">
             <button type="button" class="category-tile" data-service-filter="Electric">
                 <span class="cat-icon cat-electric">⚡</span>
                 <span class="cat-label" data-i18n="catElectrician">Electrician</span>
@@ -144,8 +130,9 @@
                 <span class="cat-icon cat-more">⋯</span>
                 <span class="cat-label" data-i18n="catMore">More Services</span>
             </button>
+                </div>
+            </div>
         </section>
-
 
         <section id="featuredSection" class="featured-section" aria-labelledby="featured-heading" style="display: none;">
             <div class="section-header">
@@ -157,13 +144,6 @@
             <div id="featuredList" class="featured-grid"></div>
         </section>
 
-
-        <section class="area-chips-section" aria-label="Browse by area">
-            <p class="area-chips-label" data-i18n="browseByArea">Browse by area</p>
-            <div class="area-chips" role="group">
-                <!-- Populated dynamically from API data by buildDynamicAreaChips() -->
-            </div>
-        </section>
 
         <main class="listings-section" id="allProviders">
             <div class="listings-header">
@@ -190,6 +170,35 @@
             </div>
             <div id="servicesList" class="services-grid" aria-live="polite"></div>
         </main>
+
+        <section class="stats-section" aria-label="Platform statistics">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value" id="statProviders">—</span>
+                    <span class="stat-label stat-label--long" data-i18n="statProviders">Active Providers</span>
+                    <span class="stat-label stat-label--short" data-i18n="statProvidersShort">Providers</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statServices">—</span>
+                    <span class="stat-label stat-label--long" data-i18n="statServices">Service Categories</span>
+                    <span class="stat-label stat-label--short" data-i18n="statServicesShort">Services</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statAreas">—</span>
+                    <span class="stat-label stat-label--long" data-i18n="statAreas">Areas Covered</span>
+                    <span class="stat-label stat-label--short" data-i18n="statAreasShort">Areas</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="area-chips-section" aria-label="Browse by area">
+            <p class="area-chips-label" data-i18n="browseByArea">Browse by area</p>
+            <div class="area-chips-wrap">
+                <div class="area-chips" role="group">
+                    <!-- Populated dynamically from API data by buildDynamicAreaChips() -->
+                </div>
+            </div>
+        </section>
 
     </div>
 
@@ -230,18 +239,24 @@
                 </div>
             </div>
             <div class="footer-columns">
-                <nav class="footer-col" aria-label="Quick links">
-                    <h4 data-i18n="quickLinks">Quick Links</h4>
-                    <ul>
+                <nav class="footer-col footer-accordion" aria-label="Quick links">
+                    <button type="button" class="footer-accordion-trigger" aria-expanded="false">
+                        <span class="footer-accordion-title" data-i18n="quickLinks">Quick Links</span>
+                        <span class="footer-accordion-icon" aria-hidden="true"></span>
+                    </button>
+                    <ul class="footer-accordion-panel">
                         <li><a href="#home" data-i18n="linkHome">Home</a></li>
                         <li><a href="#allProviders" data-i18n="linkAllServices">All Services</a></li>
                         <li><a href="#services" data-i18n="linkSearch">Search</a></li>
                         <li><a href="#contact" data-i18n="linkContact">Contact Us</a></li>
                     </ul>
                 </nav>
-                <nav class="footer-col" aria-label="Popular services">
-                    <h4 data-i18n="popularServices">Popular Services</h4>
-                    <ul>
+                <nav class="footer-col footer-accordion" aria-label="Popular services">
+                    <button type="button" class="footer-accordion-trigger" aria-expanded="false">
+                        <span class="footer-accordion-title" data-i18n="popularServices">Popular Services</span>
+                        <span class="footer-accordion-icon" aria-hidden="true"></span>
+                    </button>
+                    <ul class="footer-accordion-panel">
                         <li><a href="#services" data-service-filter="Electric" data-i18n="linkElectrician">Electrician</a></li>
                         <li><a href="#services" data-service-filter="Plumb" data-i18n="linkPlumber">Plumber</a></li>
                         <li><a href="#services" data-service-filter="Carpent" data-i18n="linkCarpenter">Carpenter</a></li>
@@ -249,18 +264,24 @@
                         <li><a href="#services" data-service-filter="Milk" data-i18n="linkMilk">Milk Service</a></li>
                     </ul>
                 </nav>
-                <nav class="footer-col" aria-label="For providers">
-                    <h4 data-i18n="forProviders">For Providers</h4>
-                    <ul>
+                <nav class="footer-col footer-accordion" aria-label="For providers">
+                    <button type="button" class="footer-accordion-trigger" aria-expanded="false">
+                        <span class="footer-accordion-title" data-i18n="forProviders">For Providers</span>
+                        <span class="footer-accordion-icon" aria-hidden="true"></span>
+                    </button>
+                    <ul class="footer-accordion-panel">
                         <li><a href="#contact" data-i18n="listBusiness">List Your Business</a></li>
                         <li><a href="#contact" data-i18n="updateListing">Update Listing</a></li>
                         <li><a href="#contact" data-i18n="support">Support</a></li>
                         <li><a href="#contact" data-i18n="terms">Terms &amp; Conditions</a></li>
                     </ul>
                 </nav>
-                <div class="footer-col">
-                    <h4 data-i18n="contactInfo">Contact Information</h4>
-                    <ul class="footer-contact-list">
+                <div class="footer-col footer-accordion">
+                    <button type="button" class="footer-accordion-trigger" aria-expanded="false">
+                        <span class="footer-accordion-title" data-i18n="contactInfo">Contact Information</span>
+                        <span class="footer-accordion-icon" aria-hidden="true"></span>
+                    </button>
+                    <ul class="footer-contact-list footer-accordion-panel">
                         <li data-i18n="contactLocation">📍 Chhatrapati Sambhajinagar, Maharashtra</li>
                         <li data-i18n="emailComingSoon">📧 Email: Coming Soon</li>
                         <li data-i18n="phoneComingSoon">📱 Phone: Coming Soon</li>
@@ -275,7 +296,7 @@
     </footer>
 
     <div id="comingSoonToast" class="coming-soon-toast" role="status" aria-live="polite" hidden></div>
-    <script src="i18n.js?v=10"></script>
-    <script src="script.js?v=10"></script>
+    <script src="i18n.js?v=12"></script>
+    <script src="script.js?v=12"></script>
 </body>
 </html>

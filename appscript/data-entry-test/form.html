@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Provider — Data Entry</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0ece4;
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+      color: #2c1a1a;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-header h1 {
+      font-size: 1.6rem;
+      color: #3d0c0c;
+      font-weight: 700;
+    }
+    .page-header p {
+      font-size: 0.9rem;
+      color: #7a5c5c;
+      margin-top: 4px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(61,12,12,0.10);
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 28px;
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #f26522;
+      border-bottom: 2px solid #fde8d8;
+      padding-bottom: 6px;
+      margin: 28px 0 18px;
+    }
+    .section-title:first-of-type { margin-top: 0; }
+
+    /* ── Form grid ── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-row.single { grid-template-columns: 1fr; }
+    @media (max-width: 520px) {
+      .form-row { grid-template-columns: 1fr; }
+      .card { padding: 20px 16px; }
+    }
+
+    /* ── Field ── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #3d0c0c;
+    }
+    .field label .req { color: #e53e3e; margin-left: 2px; }
+    .field label .opt {
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: #999;
+      margin-left: 4px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 7px;
+      font-size: 0.92rem;
+      color: #2c1a1a;
+      background: #fafafa;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #f26522;
+      box-shadow: 0 0 0 3px rgba(242,101,34,0.12);
+      background: #fff;
+    }
+    input.error, select.error { border-color: #e53e3e; }
+
+    .field-error {
+      font-size: 0.76rem;
+      color: #e53e3e;
+      display: none;
+    }
+    .field-error.visible { display: block; }
+
+    /* ── Services row (3 dropdowns) ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 520px) {
+      .services-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Toggle row ── */
+    .toggle-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .toggle-field { display: flex; align-items: center; gap: 10px; }
+    .toggle-field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #3d0c0c;
+      white-space: nowrap;
+    }
+    .toggle-field select { width: 100px; }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px;
+      margin-top: 28px;
+      background: #f26522;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-submit:hover  { background: #d4541a; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Alert banners ── */
+    .alert {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    .alert.visible { display: block; }
+    .alert.error   { background: #fff0f0; color: #c53030; border: 1px solid #feb2b2; }
+    .alert.success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+
+    /* ── Success screen ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .success-screen.visible { display: block; }
+    .success-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+    }
+    .success-screen h2 { color: #276749; font-size: 1.3rem; margin-bottom: 8px; }
+    .success-screen p  { color: #555; font-size: 0.9rem; margin-bottom: 20px; }
+    .btn-add-another {
+      padding: 10px 28px;
+      background: #3d0c0c;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-add-another:hover { background: #5c1a1a; }
+
+    /* ── Loading overlay (initial) ── */
+    .loading-overlay {
+      text-align: center;
+      padding: 48px 20px;
+      color: #7a5c5c;
+    }
+    .loading-overlay .big-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #f0e0d0;
+      border-top-color: #f26522;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    /* ── Hint text ── */
+    .hint { font-size: 0.75rem; color: #999; margin-top: 3px; }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>Service Provider Registration</h1>
+    <p>Fill in the details below to add a new service provider</p>
+  </div>
+
+  <div class="card" id="mainCard">
+
+    <!-- Loading state while options load -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="big-spinner"></div>
+      <p>Loading form options…</p>
+    </div>
+
+    <!-- The actual form (hidden until options load) -->
+    <form id="providerForm" style="display:none" novalidate>
+
+      <!-- ── Basic Info ─────────────────────────────────────── -->
+      <div class="section-title">Basic Information</div>
+
+      <div class="form-row single" style="margin-bottom:16px">
+        <div class="field">
+          <label for="provider_name">Provider / Shop Name <span class="req">*</span></label>
+          <input type="text" id="provider_name" name="provider_name"
+                 placeholder="e.g. Vetal Electricals" maxlength="100" />
+          <span class="field-error" id="err_name">Provider name is required.</span>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-bottom:16px">
+        <div class="field">
+          <label for="mobile_1">Mobile 1 <span class="req">*</span></label>
+          <input type="tel" id="mobile_1" name="mobile_1"
+                 placeholder="10-digit number" maxlength="10" inputmode="numeric" />
+          <span class="field-error" id="err_mobile1">Enter a valid 10-digit number.</span>
+        </div>
+        <div class="field">
+          <label for="mobile_2">Mobile 2 <span class="opt">(optional)</span></label>
+          <input type="tel" id="mobile_2" name="mobile_2"
+                 placeholder="10-digit number" maxlength="10" inputmode="numeric" />
+          <span class="field-error" id="err_mobile2">Enter a valid 10-digit number.</span>
+        </div>
+      </div>
+
+      <!-- ── Location ───────────────────────────────────────── -->
+      <div class="section-title">Location</div>
+
+      <div class="form-row" style="margin-bottom:16px">
+        <div class="field">
+          <label for="area">Area <span class="req">*</span></label>
+          <select id="area" name="area">
+            <option value="">— Select Area —</option>
+          </select>
+          <span class="field-error" id="err_area">Please select an area.</span>
+        </div>
+        <div class="field">
+          <label for="sub_area">Sub-Area / Landmark <span class="opt">(optional)</span></label>
+          <input type="text" id="sub_area" name="sub_area"
+                 placeholder="e.g. Near Water Tank" maxlength="100" />
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px">
+        <div class="field">
+          <label for="address">Full Address <span class="opt">(optional)</span></label>
+          <input type="text" id="address" name="address"
+                 placeholder="House no., Street, Colony…" maxlength="200" />
+        </div>
+      </div>
+
+      <!-- ── Services ───────────────────────────────────────── -->
+      <div class="section-title">Services Offered</div>
+      <p class="hint" style="margin-bottom:12px">Select up to 3 services. At least 1 is required.</p>
+
+      <div class="services-grid" style="margin-bottom:8px">
+        <div class="field">
+          <label for="job_1">Service 1 <span class="req">*</span></label>
+          <select id="job_1" name="job_1">
+            <option value="">— Select —</option>
+          </select>
+          <span class="field-error" id="err_job1">Please select at least one service.</span>
+        </div>
+        <div class="field">
+          <label for="job_2">Service 2 <span class="opt">(optional)</span></label>
+          <select id="job_2" name="job_2">
+            <option value="">— None —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="job_3">Service 3 <span class="opt">(optional)</span></label>
+          <select id="job_3" name="job_3">
+            <option value="">— None —</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── Other Details ──────────────────────────────────── -->
+      <div class="section-title">Other Details</div>
+
+      <div class="form-row" style="margin-bottom:16px">
+        <div class="field">
+          <label for="reference_source">Reference Source <span class="opt">(optional)</span></label>
+          <input type="text" id="reference_source" name="reference_source"
+                 placeholder="e.g. Self, Referral, Walk-in" maxlength="100" />
+        </div>
+        <div class="field">
+          <div class="toggle-row" style="margin-top:22px">
+            <div class="toggle-field">
+              <label for="status">Status</label>
+              <select id="status" name="status">
+                <option value="Active" selected>Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="toggle-field">
+              <label for="featured">Featured</label>
+              <select id="featured" name="featured">
+                <option value="No" selected>No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Submit ─────────────────────────────────────────── -->
+      <div class="alert error"   id="alertError"></div>
+      <div class="alert success" id="alertSuccess"></div>
+
+      <button type="submit" class="btn-submit" id="btnSubmit">
+        <div class="spinner"></div>
+        <span class="btn-text">Save Provider</span>
+      </button>
+
+    </form>
+
+    <!-- Success screen (shown after submit) -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✅</div>
+      <h2>Provider Added!</h2>
+      <p id="successMsg">The provider has been saved successfully.</p>
+      <button class="btn-add-another" onclick="resetForm()">+ Add Another</button>
+    </div>
+
+  </div><!-- /card -->
+
+  <script>
+    // ── Load dropdown options from Apps Script ────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+      google.script.run
+        .withSuccessHandler(populateDropdowns)
+        .withFailureHandler(function (err) {
+          document.getElementById('loadingOverlay').innerHTML =
+            '<p style="color:#c53030">Failed to load options: ' + err.message + '</p>';
+        })
+        .getFormOptions();
+    });
+
+    function populateDropdowns(options) {
+      fillSelect('area',  options.areas,    false);
+      fillSelect('job_1', options.services, false);
+      fillSelect('job_2', options.services, true);
+      fillSelect('job_3', options.services, true);
+
+      document.getElementById('loadingOverlay').style.display = 'none';
+      document.getElementById('providerForm').style.display   = 'block';
+    }
+
+    function fillSelect(id, items, hasNone) {
+      var sel = document.getElementById(id);
+      items.forEach(function (item) {
+        var opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        sel.appendChild(opt);
+      });
+    }
+
+    // ── Real-time validation helpers ──────────────────────────────────────────
+    function isValidPhone(val) {
+      return /^\d{10}$/.test(val.replace(/\D/g, ''));
+    }
+
+    function clearError(fieldId, errId) {
+      document.getElementById(fieldId).classList.remove('error');
+      document.getElementById(errId).classList.remove('visible');
+    }
+
+    function showError(fieldId, errId, msg) {
+      var field = document.getElementById(fieldId);
+      var err   = document.getElementById(errId);
+      field.classList.add('error');
+      if (msg) err.textContent = msg;
+      err.classList.add('visible');
+    }
+
+    // Inline validation on blur
+    document.getElementById('provider_name').addEventListener('blur', function () {
+      if (!this.value.trim()) showError('provider_name', 'err_name', '');
+      else clearError('provider_name', 'err_name');
+    });
+
+    document.getElementById('mobile_1').addEventListener('blur', function () {
+      var v = this.value.replace(/\D/g, '');
+      if (!v)           showError('mobile_1', 'err_mobile1', 'Mobile 1 is required.');
+      else if (v.length !== 10) showError('mobile_1', 'err_mobile1', 'Must be exactly 10 digits.');
+      else              clearError('mobile_1', 'err_mobile1');
+    });
+
+    document.getElementById('mobile_2').addEventListener('blur', function () {
+      var v = this.value.replace(/\D/g, '');
+      if (v && v.length !== 10) showError('mobile_2', 'err_mobile2', 'Must be exactly 10 digits (or leave blank).');
+      else clearError('mobile_2', 'err_mobile2');
+    });
+
+    document.getElementById('area').addEventListener('change', function () {
+      if (this.value) clearError('area', 'err_area');
+    });
+
+    document.getElementById('job_1').addEventListener('change', function () {
+      if (this.value) clearError('job_1', 'err_job1');
+    });
+
+    // Only allow digits in phone fields
+    ['mobile_1', 'mobile_2'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+      });
+    });
+
+    // ── Form submission ───────────────────────────────────────────────────────
+    document.getElementById('providerForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!validateForm()) return;
+      submitForm();
+    });
+
+    function validateForm() {
+      var valid = true;
+
+      var name = document.getElementById('provider_name').value.trim();
+      if (!name) { showError('provider_name', 'err_name', 'Provider name is required.'); valid = false; }
+      else clearError('provider_name', 'err_name');
+
+      var m1 = document.getElementById('mobile_1').value.replace(/\D/g, '');
+      if (!m1)            { showError('mobile_1', 'err_mobile1', 'Mobile 1 is required.'); valid = false; }
+      else if (m1.length !== 10) { showError('mobile_1', 'err_mobile1', 'Must be exactly 10 digits.'); valid = false; }
+      else clearError('mobile_1', 'err_mobile1');
+
+      var m2 = document.getElementById('mobile_2').value.replace(/\D/g, '');
+      if (m2 && m2.length !== 10) { showError('mobile_2', 'err_mobile2', 'Must be 10 digits or blank.'); valid = false; }
+      else clearError('mobile_2', 'err_mobile2');
+
+      var area = document.getElementById('area').value;
+      if (!area) { showError('area', 'err_area', 'Please select an area.'); valid = false; }
+      else clearError('area', 'err_area');
+
+      var job1 = document.getElementById('job_1').value;
+      if (!job1) { showError('job_1', 'err_job1', 'Please select at least one service.'); valid = false; }
+      else clearError('job_1', 'err_job1');
+
+      return valid;
+    }
+
+    function submitForm() {
+      hideAlerts();
+      setLoading(true);
+
+      var formData = {
+        provider_name:    document.getElementById('provider_name').value.trim(),
+        mobile_1:         document.getElementById('mobile_1').value.replace(/\D/g, ''),
+        mobile_2:         document.getElementById('mobile_2').value.replace(/\D/g, ''),
+        address:          document.getElementById('address').value.trim(),
+        area:             document.getElementById('area').value,
+        sub_area:         document.getElementById('sub_area').value.trim(),
+        job_1:            document.getElementById('job_1').value,
+        job_2:            document.getElementById('job_2').value,
+        job_3:            document.getElementById('job_3').value,
+        status:           document.getElementById('status').value,
+        featured:         document.getElementById('featured').value,
+        reference_source: document.getElementById('reference_source').value.trim()
+      };
+
+      google.script.run
+        .withSuccessHandler(handleResponse)
+        .withFailureHandler(function (err) {
+          setLoading(false);
+          showAlert('error', 'Server error: ' + err.message);
+        })
+        .submitProvider(formData);
+    }
+
+    function handleResponse(result) {
+      setLoading(false);
+      if (result.success) {
+        document.getElementById('providerForm').style.display = 'none';
+        document.getElementById('successMsg').textContent = result.message;
+        document.getElementById('successScreen').classList.add('visible');
+      } else {
+        showAlert('error', result.message);
+      }
+    }
+
+    // ── UI helpers ────────────────────────────────────────────────────────────
+    function setLoading(on) {
+      var btn = document.getElementById('btnSubmit');
+      btn.disabled = on;
+      btn.classList.toggle('loading', on);
+    }
+
+    function showAlert(type, msg) {
+      var el = document.getElementById(type === 'error' ? 'alertError' : 'alertSuccess');
+      el.textContent = msg;
+      el.classList.add('visible');
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function hideAlerts() {
+      document.getElementById('alertError').classList.remove('visible');
+      document.getElementById('alertSuccess').classList.remove('visible');
+    }
+
+    function resetForm() {
+      document.getElementById('providerForm').reset();
+      document.getElementById('providerForm').style.display = 'block';
+      document.getElementById('successScreen').classList.remove('visible');
+      hideAlerts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

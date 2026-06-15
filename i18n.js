@@ -67,6 +67,10 @@ const TRANSLATIONS = {
         statProviders: 'Total Providers',
         statServices: 'Total Services',
         statAreas: 'Areas Covered',
+        statProvidersShort: 'Providers',
+        statServicesShort: 'Services',
+        statAreasShort: 'Areas',
+        popularCategories: 'Popular categories',
         featuredProviders: 'Featured Providers',
         addressNotAvailable: 'Address Not Available',
         catHomeServices: 'Home Services',
@@ -154,6 +158,10 @@ const TRANSLATIONS = {
         statProviders: 'एकूण प्रदाते',
         statServices: 'एकूण सेवा',
         statAreas: 'भाग कव्हर',
+        statProvidersShort: 'प्रदाते',
+        statServicesShort: 'सेवा',
+        statAreasShort: 'भाग',
+        popularCategories: 'लोकप्रिय श्रेणी',
         featuredProviders: 'विशेष प्रदाते',
         addressNotAvailable: 'पता उपलब्ध नाही',
         catHomeServices: 'घरगुती सेवा',
@@ -982,7 +990,7 @@ function initI18n() {
 // services and areas are NOT covered by the dictionaries.
 // This must be run after allServices and allAreas are populated (i.e. after data loads).
 // ─────────────────────────────────────────────────────────────────────────────
-window.checkMrCoverage = function() {
+if (typeof window !== 'undefined') window.checkMrCoverage = function() {
     const prevLang = currentLang;
     currentLang = 'mr'; // force Marathi mode for the check
 
@@ -1034,3 +1042,31 @@ window.checkMrCoverage = function() {
 
     return { serviceGaps, areaGaps };
 };
+
+// ── Node.js / Jest exports ─────────────────────────────────────────────────────
+// No-op in browsers (module is undefined). Enables unit testing without a build tool.
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = {
+        // Core translation
+        t,
+        toLocalNum,
+        // Language state (avoid setLanguage in tests — it touches DOM)
+        _setLang: function(l) { currentLang = l; },
+        _getLang: function()  { return currentLang; },
+        // Transliteration
+        transliterateWord,
+        transliterateLatin,
+        // Label translators
+        translateAreaLabel,
+        translateProviderName,
+        translateServiceLabel,
+        translateStatusLabel,
+        // Storage helper
+        getStoredLanguage,
+        // Raw dictionaries — useful for completeness checks in tests
+        TRANSLATIONS,
+        AREA_LABELS_MR,
+        SERVICE_LABELS_MR,
+        PROVIDER_NAME_PARTS_MR,
+    };
+}
