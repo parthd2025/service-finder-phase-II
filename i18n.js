@@ -90,7 +90,13 @@ const TRANSLATIONS = {
         resultsFound: 'providers found',
         noAreaListed: 'No area listed',
         browsePromptTitle: 'Search or browse to find providers',
-        browsePromptSub: 'Use the search bar above, or pick a category, area, or service to get started.'
+        browsePromptSub: 'Use the search bar above, or pick a category, area, or service to get started.',
+        searchMiniDefault: 'Search providers',
+        searchMiniActive: 'Filtered results',
+        installAppLabel: 'Add to Home Screen',
+        installAppTooltip: 'Add to Home Screen',
+        installAppIosHelp: 'Tap Share ⎙ then choose "Add to Home Screen"',
+        installAppUnavailable: 'Open in Chrome (Android) or Safari (iPhone) to install'
     },
     mr: {
         metaDescription: 'छत्रपती संभाजीनगरमध्ये विश्वासार्ह स्थानिक सेवा — इलेक्ट्रिशियन, प्लंबर, टॅक्सी, दूध वितरण आणि अधिक.',
@@ -181,7 +187,13 @@ const TRANSLATIONS = {
         resultsFound: 'प्रदाते सापडले',
         noAreaListed: 'भाग नोंदवलेला नाही',
         browsePromptTitle: 'सेवा शोधण्यासाठी शोधा किंवा निवडा',
-        browsePromptSub: 'वरील शोध बार वापरा, किंवा श्रेणी, भाग किंवा सेवा निवडा.'
+        browsePromptSub: 'वरील शोध बार वापरा, किंवा श्रेणी, भाग किंवा सेवा निवडा.',
+        searchMiniDefault: 'प्रदाते शोधा',
+        searchMiniActive: 'फिल्टर केलेले निकाल',
+        installAppLabel: 'होम स्क्रीनवर जोडा',
+        installAppTooltip: 'होम स्क्रीनवर जोडा',
+        installAppIosHelp: 'शेअर ⎙ वर टॅप करा, नंतर "Add to Home Screen" निवडा',
+        installAppUnavailable: 'इन्स्टॉलसाठी Chrome (Android) किंवा Safari (iPhone) वापरा'
     }
 };
 

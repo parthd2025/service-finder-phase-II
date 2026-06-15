@@ -31,7 +31,79 @@ const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZ0WUtV
 // Change this value in BOTH files whenever you rotate the token.
 const API_TOKEN = 'csnseva_ph2_2026';
 
-// ==== INITIALIZATION ====
+const CACHE_KEY = 'csnseva_providers_v1';
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+let searchDebounceTimer = null;
+let uiBootstrapped = false;
+
+function debouncedApplyAllFilters() {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(applyAllFilters, 250);
+}
+
+function loadCachedProviders() {
+    try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.ts || Date.now() - parsed.ts > CACHE_TTL_MS) return null;
+        return parsed.data;
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveCachedProviders(data) {
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) { /* private mode / quota */ }
+}
+
+function ingestProviderData(data) {
+    if (Array.isArray(data)) {
+        allProviders = data;
+    } else {
+        allProviders = data.providers || [];
+        if (data.areas && data.areas.length > 0) allAreas = data.areas.sort();
+        if (data.categories && data.categories.length > 0) allCategories = data.categories.sort();
+    }
+
+    extractUniqueServices();
+    if (allAreas.length === 0) extractUniqueAreas();
+    buildServiceEmojiMap();
+    buildServiceAreaMaps();
+}
+
+function refreshDataViews(isBackgroundRefresh) {
+    buildFilterOptions();
+    buildDynamicAreaChips();
+    buildCategoryGrid();
+    buildStatistics();
+    buildFeaturedSection();
+    initScrollHints();
+
+    if (isBackgroundRefresh) {
+        refreshFilterOptionLabels();
+        if (customServiceSelect) customServiceSelect.refresh();
+        if (customAreaSelect) customAreaSelect.refresh();
+    }
+}
+
+function bootstrapUiAfterData(isBackgroundRefresh) {
+    const loadingMessage = document.getElementById('loadingMessage');
+    if (loadingMessage) loadingMessage.style.display = 'none';
+
+    refreshDataViews(isBackgroundRefresh);
+
+    if (!uiBootstrapped) {
+        addEventListeners();
+        initAreaChips();
+        initCategoryTiles();
+        uiBootstrapped = true;
+    }
+
+    applyAllFilters();
+}
 if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', function() {
     initI18n();
 
@@ -46,6 +118,8 @@ if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded
     initViewAllLinks();
     initClearFiltersButton();
     initFooterAccordion();
+    initSearchMiniBar();
+    initInstallPrompt();
 
     loadProviders();
 });
@@ -67,9 +141,30 @@ function loadProviders() {
     const errorMessage   = document.getElementById('errorMessage');
     const servicesList   = document.getElementById('servicesList');
 
-    loadingMessage.style.display = 'block';
     errorMessage.hidden = true;
     servicesList.innerHTML = '';
+
+    const cached = loadCachedProviders();
+    if (cached) {
+        ingestProviderData(cached);
+        bootstrapUiAfterData(false);
+        fetchProvidersFromNetwork(true);
+        return;
+    }
+
+    fetchProvidersFromNetwork(false);
+}
+
+function fetchProvidersFromNetwork(background) {
+    const loadingMessage = document.getElementById('loadingMessage');
+    const errorMessage   = document.getElementById('errorMessage');
+    const servicesList   = document.getElementById('servicesList');
+
+    if (!background) {
+        loadingMessage.style.display = 'block';
+        errorMessage.hidden = true;
+        servicesList.innerHTML = '';
+    }
 
     fetch(GOOGLE_APPS_SCRIPT_URL + '?token=' + API_TOKEN)
         .then(function(response) {
@@ -77,44 +172,18 @@ function loadProviders() {
             return response.json();
         })
         .then(function(data) {
-            // Surface API-level errors from doGet.gs try/catch
             if (data.error) {
                 throw new Error('API error: ' + data.error);
             }
 
-            // Support new shape { providers, categories, areas }
-            // and old flat array shape for backward compatibility
-            if (Array.isArray(data)) {
-                allProviders = data;
-            } else {
-                allProviders = data.providers || [];
-                // Use server-provided metadata when available
-            if (data.areas       && data.areas.length       > 0) allAreas       = data.areas.sort();
-            if (data.categories  && data.categories.length  > 0) allCategories  = data.categories.sort();
-            }
-
-            extractUniqueServices();
-            if (allAreas.length === 0) extractUniqueAreas();
-            buildServiceEmojiMap();
-            buildServiceAreaMaps();
-
-            loadingMessage.style.display = 'none';
-
-            buildFilterOptions();
-            buildDynamicAreaChips();
-            buildCategoryGrid();
-            buildStatistics();
-            buildFeaturedSection();
-            initScrollHints();
-
-            addEventListeners();
-            initAreaChips();
-            initCategoryTiles();
-
-            applyAllFilters();
+            saveCachedProviders(data);
+            ingestProviderData(data);
+            bootstrapUiAfterData(background);
         })
         .catch(function(error) {
             console.error('Error loading providers:', error);
+            if (background) return;
+
             loadingMessage.style.display = 'none';
             errorMessage.hidden = false;
             servicesList.innerHTML = '';
@@ -485,12 +554,21 @@ function createProviderCard(provider, isFeatured) {
 
     const address = String(provider.address || '').trim();
     const translatedAddress = address ? translateAreaLabel(address) : '';
-    const displayAddress = (translatedAddress && translatedAddress.toLowerCase() !== 'undefined')
-        ? escapeHtml(translatedAddress)
-        : t('addressNotAvailable');
+    const hasRealAddress = !!(address && translatedAddress && translatedAddress.toLowerCase() !== 'undefined');
+    const displayAddress = hasRealAddress ? escapeHtml(translatedAddress) : '';
 
     const rawArea     = provider.area || '';
     const displayArea = rawArea ? escapeHtml(translateAreaLabel(String(rawArea).trim())) : '';
+
+    let metaLines = '';
+    if (hasRealAddress) {
+        metaLines += '<p class="card-location">📍 ' + displayAddress + '</p>';
+    }
+    if (displayArea) {
+        metaLines += '<p class="card-area">🏘️ ' + displayArea + '</p>';
+    } else if (!hasRealAddress) {
+        metaLines += '<p class="card-area card-area--unknown">📋 ' + escapeHtml(t('noAreaListed')) + '</p>';
+    }
 
     const badgeHtml = isFeatured
         ? '<div class="featured-badge" aria-label="Featured">⭐ Featured</div>'
@@ -522,10 +600,7 @@ function createProviderCard(provider, isFeatured) {
             '<div class="card-meta">' +
                 '<h3 class="card-name">' + escapeHtml(getProviderDisplayName(provider)) + '</h3>' +
                 servicesHtml +
-                '<p class="card-location">📍 ' + displayAddress + '</p>' +
-                (displayArea
-                    ? '<p class="card-area">🏘️ ' + displayArea + '</p>'
-                    : '<p class="card-area card-area--unknown">📋 ' + escapeHtml(t('noAreaListed')) + '</p>') +
+                metaLines +
             '</div>' +
         '</div>' +
         '<div class="card-actions">' +
@@ -597,11 +672,15 @@ function applyAllFilters() {
     if (!hasActiveFilter()) {
         showBrowsePrompt();
         updateStatistics(allProviders);
+        updateAreaChipsSection();
+        updateSearchMiniBar(allProviders.length);
         return;
     }
 
     displayProviders(sortedProviders);
     updateStatistics(filteredProviders);
+    updateAreaChipsSection();
+    updateSearchMiniBar(sortedProviders.length);
 }
 
 function hasActiveFilter() {
@@ -739,11 +818,10 @@ function displayProviders(providers) {
 
     if (providers.length === 0) {
         servicesList.innerHTML =
-            '<div class="empty-state">' +
-                '<div class="empty-icon">🔍</div>' +
+            '<div class="empty-state empty-state--compact">' +
                 '<p class="empty-message">' + escapeHtml(t('noResults')) + '</p>' +
                 '<button type="button" class="btn-clear-filters" onclick="clearAllFilters()">' +
-                    (t('clearFilters') || 'Clear Filters') +
+                    escapeHtml(t('clearFilters') || 'Clear Filters') +
                 '</button>' +
             '</div>';
         return;
@@ -1372,6 +1450,52 @@ function initAreaChips() {
     }
 }
 
+function updateAreaChipsSection() {
+    const section = document.querySelector('.area-chips-section');
+    if (section) section.classList.toggle('is-collapsed', hasActiveFilter());
+
+    const stats = document.querySelector('.stats-section');
+    if (stats) stats.classList.toggle('is-collapsed', hasActiveFilter());
+}
+
+function updateSearchMiniBar(resultCount) {
+    const labelEl = document.getElementById('searchMiniLabel');
+    const countEl = document.getElementById('searchMiniCount');
+    if (!labelEl || !countEl) return;
+
+    const total = typeof resultCount === 'number' ? resultCount : allProviders.length;
+
+    if (hasActiveFilter()) {
+        labelEl.textContent = t('searchMiniActive');
+        countEl.textContent = toLocalNum(total) + ' ' + t('resultsFound');
+    } else {
+        labelEl.textContent = t('searchMiniDefault');
+        countEl.textContent = toLocalNum(allProviders.length) + ' ' + t('statProvidersShort');
+    }
+}
+
+function initSearchMiniBar() {
+    const bar  = document.getElementById('searchMiniBar');
+    const band = document.querySelector('.search-band');
+    const btn  = document.getElementById('searchMiniBtn');
+    if (!bar || !band) return;
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(function(entries) {
+            bar.hidden = entries[0].isIntersecting;
+        }, { threshold: 0, rootMargin: '0px' });
+        observer.observe(band);
+    }
+
+    if (btn) {
+        btn.addEventListener('click', function() {
+            band.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const searchBox = document.getElementById('searchBox');
+            if (searchBox) setTimeout(function() { searchBox.focus(); }, 350);
+        });
+    }
+}
+
 function initFooterAccordion() {
     document.querySelectorAll('.footer-accordion-trigger').forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -1423,7 +1547,7 @@ function initFooterServiceLinks() {
 }
 
 function addEventListeners() {
-    document.getElementById('searchBox').addEventListener('input', applyAllFilters);
+    document.getElementById('searchBox').addEventListener('input', debouncedApplyAllFilters);
 
     document.getElementById('serviceFilter').addEventListener('change', function() {
         // Sync category-tile active states
@@ -1464,6 +1588,89 @@ function addEventListeners() {
 
     const sortFilter = document.getElementById('sortFilter');
     if (sortFilter) sortFilter.addEventListener('change', applyAllFilters);
+}
+
+// ── PWA install button (header) ───────────────────────────────────────────────
+let deferredInstallPrompt = null;
+
+function isAppStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+}
+
+function isIosDevice() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function showAppToast(message, durationMs) {
+    const toast = document.getElementById('comingSoonToast');
+    if (!toast) return;
+
+    durationMs = durationMs || 3500;
+    toast.textContent = message;
+    toast.classList.add('toast-wide');
+    toast.hidden = false;
+    toast.getBoundingClientRect();
+    toast.classList.add('visible');
+
+    clearTimeout(showAppToast._timer);
+    showAppToast._timer = setTimeout(function() {
+        toast.classList.remove('visible');
+        setTimeout(function() {
+            toast.hidden = true;
+            toast.classList.remove('toast-wide');
+        }, 260);
+    }, durationMs);
+}
+
+function initInstallPrompt() {
+    const wrap = document.getElementById('installAppWrap');
+    const btn  = document.getElementById('installAppBtn');
+    if (!wrap || !btn || isAppStandalone()) return;
+
+    let tooltipTimer = null;
+
+    function flashTooltip() {
+        btn.classList.add('show-tooltip');
+        clearTimeout(tooltipTimer);
+        tooltipTimer = setTimeout(function() {
+            btn.classList.remove('show-tooltip');
+        }, 2200);
+    }
+
+    if (isIosDevice()) {
+        wrap.hidden = false;
+        btn.addEventListener('click', function() {
+            flashTooltip();
+            showAppToast(t('installAppIosHelp'), 4500);
+        });
+        return;
+    }
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        wrap.hidden = false;
+    });
+
+    window.addEventListener('appinstalled', function() {
+        wrap.hidden = true;
+        deferredInstallPrompt = null;
+    });
+
+    btn.addEventListener('click', function() {
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            deferredInstallPrompt.userChoice.then(function(choice) {
+                if (choice.outcome === 'accepted') wrap.hidden = true;
+                deferredInstallPrompt = null;
+            });
+            return;
+        }
+
+        flashTooltip();
+        showAppToast(t('installAppUnavailable'), 3500);
+    });
 }
 
 // ── Coming-soon toast for social icons & email ────────────────────────────────
